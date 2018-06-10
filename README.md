@@ -11,7 +11,7 @@
 - Technologies: //TODO
 
 ### **Mining** software
-- Contributor: //TODO
+- Contributor: **Velik Lazarov - [VelikHimik](https://github.com/VelikHimik)**
 - Functionality: **proof-of-work**
 - Technologies: //TODO
 
