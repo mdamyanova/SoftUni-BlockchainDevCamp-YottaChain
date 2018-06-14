@@ -1,14 +1,15 @@
-# BlockchainDevCamp-SoftUni-PracticalProject
+# YottaChain
+Practical Project for the Blockchain Dev Camp at SoftUni
 
 ## Project Description
-//TODO is a **fully-functional blockchain** network consisting of **Nodes**, **Mining** software, **Wallet** software, **Faucet** app, **Block Explorer** app.
+YottaChain is a **fully-functional blockchain** network consisting of **Nodes**, **Mining** software, **Wallet** software, **Faucet** app, **Block Explorer** app.
 
 ## Technologies and Contribution
 
 ### **Node**
 - Contributor: **Mirela Damyanova - [mdamyanova](https://github.com/mdamyanova)**
 - Functionality: **peer-to-peer communication, blocks, transactions, consensus, REST API**
-- Technologies: //TODO
+- Technologies: Java, Spring MVC, BouncyCastle
 
 ### **Mining** software
 - Contributor: **Velik Lazarov - [VelikHimik](https://github.com/VelikHimik)**
