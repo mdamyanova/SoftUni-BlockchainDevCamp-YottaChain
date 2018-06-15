@@ -7,8 +7,16 @@ import javax.persistence.Id;
 
 @Entity(name = "blocks")
 public class Block {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    //TODO - Create
+    //int Index
+    //List<Transaction> Transactions
+    //long Difficulty
+    //String PrevBlockHash
+    //Address MinedBy
+    //String BlockDataHash
+    //long Nonce
+    //DateTime CreatedOn
+    //String BlockHash
+    //void GenerateHashes()
+    //static Block Genesis
 }

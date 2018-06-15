@@ -7,8 +7,15 @@ import javax.persistence.Id;
 
 @Entity(name = "transactions")
 public class Transaction {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    // TODO - Create
+    //String TransactionHash
+    //Address From
+    //Address To
+    //long Amount
+    //String SenderPublickKey
+    //List<String> SenderSignature
+    //long Nonce
+    //int MinedInBlockIndex
+    //boolean Paid
+    //String TransactionData
 }

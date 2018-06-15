@@ -11,7 +11,7 @@ public interface NodeService {
 
     NodeInfoViewModel GetInfo();
     List<BlockViewModel> GetAllBlocks();
-    BlockViewModel GetBlock(int blockIndex);
+    BlockViewModel GetBlock(int blockIndex) throws Exception;
     TransactionViewModel GetTransactionInfo(String transactionHash);
     TransactionCreatedViewModel AddTransaction(TransactionViewModel transaction);
 }

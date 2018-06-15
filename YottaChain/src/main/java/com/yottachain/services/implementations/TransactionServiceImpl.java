@@ -8,16 +8,19 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction Create(TransactionViewModel transaction) {
+        // TODO - Create new object from type Transaction and return it
         return null;
     }
 
     @Override
     public Transaction Sign(Transaction transaction, String privateKey) {
+        // TODO - Get transaction data, hash, sign, create signature and return transaction
         return null;
     }
 
     @Override
     public boolean Validate(Transaction transaction) {
+        // TODO - Get transaction data, hash, validate signature
         return false;
     }
 }
