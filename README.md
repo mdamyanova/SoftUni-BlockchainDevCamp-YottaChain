@@ -19,7 +19,7 @@ YottaChain is a **fully-functional blockchain** network consisting of **Nodes**,
 ### **Wallet** software
 - Contributor: **Emil Yordanov - [zyppyvids](https://github.com/zyppyvids)**
 - Functionality: **handle private keys + sign and send transactions**
-- Technologies: //TODO
+- Technologies: C#, BouncyCastle
 
 ### **Faucet** app
 - Contributor: //TODO
