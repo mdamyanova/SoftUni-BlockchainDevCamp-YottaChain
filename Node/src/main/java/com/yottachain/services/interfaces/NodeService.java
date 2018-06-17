@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface NodeService {
 
-    NodeInfoViewModel GetInfo();
-    List<BlockViewModel> GetAllBlocks();
-    BlockViewModel GetBlock(int blockIndex) throws Exception;
-    TransactionViewModel GetTransactionInfo(String transactionHash);
-    TransactionCreatedViewModel AddTransaction(TransactionViewModel transaction);
+    NodeInfoViewModel getInfo();
+    List<BlockViewModel> getAllBlocks();
+    BlockViewModel getBlock(int blockIndex) throws Exception;
+    TransactionViewModel getTransactionInfo(String transactionHash);
+    TransactionCreatedViewModel addTransaction(TransactionViewModel transaction);
 }

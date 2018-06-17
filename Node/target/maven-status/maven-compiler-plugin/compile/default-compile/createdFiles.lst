@@ -13,11 +13,12 @@ com\yottachain\p2p\Peer.class
 com\yottachain\controllers\InfoController.class
 com\yottachain\entities\Transaction.class
 com\yottachain\models\viewModels\BlockViewModel.class
+com\yottachain\services\implementations\NodeServiceImpl$1.class
 com\yottachain\controllers\BlocksController.class
 com\yottachain\entities\Address.class
 com\yottachain\models\viewModels\NodeInfoViewModel.class
-com\yottachain\entities\Example.class
 com\yottachain\config\WebSocketConfig.class
+com\yottachain\entities\Node.class
 com\yottachain\controllers\NodeController.class
 com\yottachain\services\implementations\NodeServiceImpl.class
 com\yottachain\services\implementations\TransactionServiceImpl.class

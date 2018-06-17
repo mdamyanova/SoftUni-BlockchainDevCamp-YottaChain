@@ -1,5 +1,7 @@
 package com.yottachain.controllers;
 
+import com.yottachain.models.viewModels.NodeInfoViewModel;
+import com.yottachain.services.implementations.NodeServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -12,13 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class InfoController {
 
-    // GET Info
-    @MessageMapping("/hello")
-    @SendTo("/peer/hello")
-    public ResponseEntity<String> info() {
-        // TODO
+    private final NodeServiceImpl nodeService = new NodeServiceImpl();
 
-        return new ResponseEntity<String>("TODO", HttpStatus.OK);
+    // GET Info
+    @GetMapping("/info")
+    public ResponseEntity<NodeInfoViewModel> info() {
+        NodeInfoViewModel model = nodeService.getInfo();
+        return new ResponseEntity<NodeInfoViewModel>(model, HttpStatus.OK);
     }
 
     // GET Debug

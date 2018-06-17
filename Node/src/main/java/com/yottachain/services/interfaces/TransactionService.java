@@ -5,7 +5,7 @@ import com.yottachain.models.viewModels.TransactionViewModel;
 
 public interface TransactionService {
 
-    Transaction Create(TransactionViewModel transaction);
-    Transaction Sign(Transaction transaction, String privateKey);
-    boolean Validate(Transaction transaction);
+    Transaction create(TransactionViewModel transaction);
+    Transaction sign(Transaction transaction, String privateKey);
+    boolean validate(Transaction transaction);
 }
