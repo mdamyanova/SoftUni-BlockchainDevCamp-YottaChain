@@ -2,6 +2,7 @@ package com.yottachain.controllers;
 
 import com.yottachain.models.viewModels.NodeInfoViewModel;
 import com.yottachain.services.implementations.NodeServiceImpl;
+import com.yottachain.services.interfaces.NodeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -14,7 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class InfoController {
 
-    private final NodeServiceImpl nodeService = new NodeServiceImpl();
+    private final NodeService nodeService;
+
+    public InfoController() {
+        this.nodeService = new NodeServiceImpl();
+    }
 
     // GET Info
     @GetMapping("/info")

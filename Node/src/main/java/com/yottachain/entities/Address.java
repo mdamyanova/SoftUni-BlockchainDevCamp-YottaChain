@@ -1,9 +1,20 @@
 package com.yottachain.entities;
 
 public class Address {
-    //TODO - Create
-    //String AddressId
-    //Long Amount
-    //Address GeneratorAddress
-    // TODO - validate address
+
+    private String addressId;
+    private long amount;
+
+    public Address(String address)
+    {
+        this.addressId = address;
+    }
+
+    public String getAddressId() {
+        return addressId;
+    }
+
+    public long getAmount() {
+        return amount;
+    }
 }

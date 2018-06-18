@@ -1,17 +1,19 @@
 package com.yottachain.services.implementations;
 
+import com.yottachain.entities.Address;
 import com.yottachain.entities.Block;
+import com.yottachain.entities.Transaction;
 import com.yottachain.models.viewModels.BlockViewModel;
 import com.yottachain.models.viewModels.NodeInfoViewModel;
 import com.yottachain.models.viewModels.TransactionCreatedViewModel;
 import com.yottachain.models.viewModels.TransactionViewModel;
 import com.yottachain.services.interfaces.NodeService;
+import org.bouncycastle.util.encoders.Hex;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class NodeServiceImpl implements NodeService {
 
@@ -20,122 +22,8 @@ public class NodeServiceImpl implements NodeService {
 
     public NodeServiceImpl() {
         this.mapper = new ModelMapper();
-        this.blockchain = new List<Block>() {
-            @Override
-            public int size() {
-                return 0;
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return false;
-            }
-
-            @Override
-            public boolean contains(Object o) {
-                return false;
-            }
-
-            @Override
-            public Iterator<Block> iterator() {
-                return null;
-            }
-
-            @Override
-            public Object[] toArray() {
-                return new Object[0];
-            }
-
-            @Override
-            public <T> T[] toArray(T[] a) {
-                return null;
-            }
-
-            @Override
-            public boolean add(Block block) {
-                return false;
-            }
-
-            @Override
-            public boolean remove(Object o) {
-                return false;
-            }
-
-            @Override
-            public boolean containsAll(Collection<?> c) {
-                return false;
-            }
-
-            @Override
-            public boolean addAll(Collection<? extends Block> c) {
-                return false;
-            }
-
-            @Override
-            public boolean addAll(int index, Collection<? extends Block> c) {
-                return false;
-            }
-
-            @Override
-            public boolean removeAll(Collection<?> c) {
-                return false;
-            }
-
-            @Override
-            public boolean retainAll(Collection<?> c) {
-                return false;
-            }
-
-            @Override
-            public void clear() {
-
-            }
-
-            @Override
-            public Block get(int index) {
-                return null;
-            }
-
-            @Override
-            public Block set(int index, Block element) {
-                return null;
-            }
-
-            @Override
-            public void add(int index, Block element) {
-
-            }
-
-            @Override
-            public Block remove(int index) {
-                return null;
-            }
-
-            @Override
-            public int indexOf(Object o) {
-                return 0;
-            }
-
-            @Override
-            public int lastIndexOf(Object o) {
-                return 0;
-            }
-
-            @Override
-            public ListIterator<Block> listIterator() {
-                return null;
-            }
-
-            @Override
-            public ListIterator<Block> listIterator(int index) {
-                return null;
-            }
-
-            @Override
-            public List<Block> subList(int fromIndex, int toIndex) {
-                return null;
-            }
-        };
+        this.blockchain = new ArrayList<>();
+        this.blockchain.add(generateGenesisBlock());
     }
 
     @Override
@@ -150,9 +38,8 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public List<BlockViewModel> getAllBlocks() {
         Type targetListType = new TypeToken<List<BlockViewModel>>() {}.getType();
-        List<BlockViewModel> allBlocks = blockchain.size() > 0 ?
+        return blockchain.size() > 0 ?
                 mapper.map(blockchain, targetListType) : Collections.emptyList();
-        return allBlocks;
     }
 
     @Override
@@ -161,9 +48,35 @@ public class NodeServiceImpl implements NodeService {
             throw new Exception("No such block"); // TODO - Make custom exception for Block not found
         }
 
-        Block block = blockchain.stream().filter(x -> x.getIndex() == blockIndex).findFirst().get();
+        Block block = blockchain.stream().filter(x -> x.getIndex() == blockIndex).findFirst().orElse(null);
+
+        if (block == null) {
+          throw new Exception("");
+        }
 
         return mapper.map(block, BlockViewModel.class);
+
+    }
+
+    @Override
+    public Block generateGenesisBlock() {
+       // if (blockchain.size() != 0)
+
+        Block genesis = new Block();
+        List<Transaction> transactions = new ArrayList<>();
+        Address minedBy = new Address("00");
+
+        genesis.setIndex(0);
+        genesis.setTransactions(transactions);
+        genesis.setDifficulty(1);
+        genesis.setPreviousBlockHash("NONE");
+        genesis.setMinedBy(minedBy);
+        genesis.setBlockDataHash(Hex.toHexString("TODO".getBytes()));
+        genesis.setNonce(123456789L);
+        genesis.setCreatedOn(0L);
+        genesis.setBlockDataHash(Hex.toHexString("TODO".getBytes()));
+
+        return genesis; // TODO - clever way to return ?
     }
 
     @Override

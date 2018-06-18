@@ -18,18 +18,7 @@ public class BlockViewModel {
     private Date createdOn;
     private String blockHash;
 
-    public BlockViewModel(int index, List<Transaction> transactions, long difficulty,
-                          String previousBlockHash, Address minedBy, String blockDataHash,
-                          long nonce, Date createdOn, String blockHash) {
-        this.index = index;
-        this.transactions = transactions;
-        this.difficulty = difficulty;
-        this.previousBlockHash = previousBlockHash;
-        this.minedBy = minedBy;
-        this.blockDataHash = blockDataHash;
-        this.nonce = nonce;
-        this.createdOn = createdOn;
-        this.blockHash = blockHash;
+    public BlockViewModel() {
     }
 
     public int getIndex() {

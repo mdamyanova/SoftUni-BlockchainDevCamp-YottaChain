@@ -20,8 +20,11 @@ import java.util.ListIterator;
 @RestController
 public class BlocksController {
 
-    // TODO - initialisation is not good
-    private final NodeServiceImpl nodeService = new NodeServiceImpl();
+    private final NodeService nodeService;
+
+    public BlocksController() {
+        this.nodeService = new NodeServiceImpl();
+    }
 
     // GET Blocks
     @GetMapping("/blocks")
