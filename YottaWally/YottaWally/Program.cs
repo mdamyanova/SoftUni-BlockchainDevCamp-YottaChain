@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using System.IO;
+using System.Reflection;
 
 namespace YottaWally
 {
@@ -39,6 +40,8 @@ namespace YottaWally
                 "balance", "history", "send", "exit" //Allowed functionality in Wallet
             };
 
+            if (loadWallet == true) goto outOfWhile; //If a wallet is loaded go to Wallet Options
+
             if (startCounter == 1) //Prevent Showing unnecessary things
             {
                 Initialize();
@@ -58,9 +61,7 @@ namespace YottaWally
                 switch (input.ToLower()) //Main Functionlaity Logic
                 {
                     case "create":
-                        loadWallet = CreateWallet(); // Returns True if created
-                        if (loadWallet == false) Print("Try to create a Wallet again!"); //Prompts to create new wallet if the wallet is not Created
-                        else goto outOfWhile;
+                        if (!CreateWallet()) Print("Try to create a Wallet again!"); //Prompts to create new wallet if the wallet is not Created
                         break;
 
                     case "mywallets":
@@ -74,6 +75,7 @@ namespace YottaWally
                         break;
 
                     case "recover":
+                        if (!RecoverWallet()) Print("Try to recover the Wallet again!"); //Prompts to recover wallet if the wallet was not Recovered
                         break;
                 }
             }
@@ -181,7 +183,7 @@ namespace YottaWally
             return '1';
         }
 
-        static bool CreateWallet() ///Creates Account with its Private Key, Public Key and Address
+        static bool CreateWallet() ///Creates Account with its Private Keys, Public Keys and Addresses
         {
             Write(">>> Type Wallet Name: ");
             string walletName = ReadLine();
@@ -317,6 +319,114 @@ namespace YottaWally
             return true;
         }
 
+        static bool RecoverWallet() ///Recovers Wallet from 5 Private Keys
+        {
+            Write(">>> Type New Wallet Name: ");
+            string walletName = ReadLine();
+            if (Directory.Exists($@"Wallets/{walletName}"))
+            {
+                Print($"ERROR! WALLET \"{walletName.ToUpper()}\" ALREADY EXISTS!");
+                return false;
+            }
+            Write(">>> Type New Wallet Password ");
+            string password = GetHiddenConsoleInput();
+            WriteLine();
+            Write(">>> Password Confirmation ");
+            string pwConfirm = GetHiddenConsoleInput();
+            WriteLine();
+            if (password == pwConfirm)
+            {
+                try
+                {
+                    List<byte[]> privateKeys = new List<byte[]>(); //List with all Private Keys in Byte Type
+                    List<byte[]> publicKeys = new List<byte[]>(); //List with all Public Keys in Byte Type
+
+                    List<string> privateKeysString = new List<string>(); //List with all Private Keys
+                    List<string> publicKeysString = new List<string>(); //List with all Public Keys
+                    List<string> pubKeysCompressed = new List<string>(); //List of Compressed Public Keys
+                    List<string> addresses = new List<string>(); //List of Addresses extracted from Compressed Public Keys
+
+                    try
+                    {
+                        Print("Write down your Private Keys: ");
+                        for (int i = 0; i < 5; i++)
+                        {
+                            Write(">>> ");
+                            privateKeys.Add(StringToByteArray(ReadLine()));
+                            WriteLine();
+                        }
+                    }
+                    catch
+                    {
+                        throw new ArgumentException("COULD NOT GET PRIVATE KEYS!");
+                    }
+
+                    try
+                    {
+                        for (int i = 0; i < 5; i++)
+                        {
+                            Byte[] pubKey = Secp256K1Manager.GetPublicKey(privateKeys[i], false);
+                            publicKeys.Add(pubKey);
+                        }
+                    }
+                    catch
+                    {
+                        throw new ArgumentException("COULD NOT RECOVER PUBLIC KEYS!");
+                    }
+
+                    for (int i = 0; i < 5; i++)
+                    {
+                        string privKeyString = GeneratePrivateKey(privateKeys[i]).ToLower();
+                        string pubKeyString = string.Join("", BitConverter.ToString(publicKeys[i]).Replace("-", "").Skip(2)).ToLower();
+                        privateKeysString.Add(privKeyString);
+                        publicKeysString.Add(pubKeyString);
+                    }
+
+                    try
+                    {
+                        for (int i = 0; i < 5; i++)
+                        {
+                            string pubKeyCompressed = GetPublicKeyCompressed(publicKeysString[i]).ToLower();
+                            string address = RipeMDHash(pubKeyCompressed);
+                            pubKeysCompressed.Add(pubKeyCompressed);
+                            addresses.Add(address);
+                        }
+                    }
+                    catch
+                    {
+                        throw new ArgumentException("COULD NOT COMPRESS PUBLIC KEYS!");
+                    }
+                    WriteLine("--------------- WALLET INFO ---------------");
+                    WriteLine();
+                    WriteLine("--------------- Private Keys --------------\n" + string.Join("\n", privateKeysString));
+                    WriteLine("--------------- Public Keys ---------------\n" + string.Join("\n", publicKeysString));
+                    WriteLine("---------- PublicKeys Compressed ----------\n" + string.Join("\n", pubKeysCompressed));
+                    WriteLine("---------------- Addresses ----------------\n" + string.Join("\n", addresses));
+                    WriteLine();
+                    WriteLine("Write down and keep in SECURE place your private keys. Only through them you can access your coins!");
+                    WriteLine();
+                    Write(">>> Do you want to Save your Wallet to a JSON file? [Y/N]: ");
+                    bool saveWallet = ReadLine().ToLower() == "y";
+                    if (saveWallet)
+                    {
+                        SaveToJSON(walletName, password, privateKeysString, publicKeysString, pubKeysCompressed, addresses);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Print($"ERROR! {e.Message}");
+                    return false;
+                }
+                openedWalletName = walletName;
+                return true;
+            }
+            else
+            {
+                Print($"ERROR! PASSWORDS DO NOT MATCH!");
+                return false;
+            }
+        }
+
         static bool SaveToJSON(string walletName, string password, List<string> privateKeys,List<string>publicKeys,List<string> pubKeysCompressed,List<string> addresses)
         {
             if (!Directory.Exists($@"Wallets/{walletName}"))
@@ -350,6 +460,14 @@ namespace YottaWally
             }
 
             return sb.ToString().ToLower();
+        }
+
+        static byte[] StringToByteArray(string hex)
+        {
+            return Enumerable.Range(0, hex.Length)
+                             .Where(x => x % 2 == 0)
+                             .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                             .ToArray();
         }
 
         private static string GetPasswordHash(string password) ///Gets SHA-256 Hash of the given Password
@@ -420,6 +538,7 @@ namespace YottaWally
 
         static void GetAllWallets() ///Prints All Wallets on this Computer
         {
+            Directory.CreateDirectory($@"Wallets/");
             string[] allWallets = Directory.GetFiles(@"Wallets/", "*.zip");
             if (allWallets.Length > 0)
             {
@@ -440,7 +559,10 @@ namespace YottaWally
             if (ans.ToLower() != "y")
             {
                 if (ans.ToLower() == "n")
+                {
                     Main();
+                }
+
                 else Exit();
             }
             else if (ans.ToLower() == "y") loadWallet = false;
