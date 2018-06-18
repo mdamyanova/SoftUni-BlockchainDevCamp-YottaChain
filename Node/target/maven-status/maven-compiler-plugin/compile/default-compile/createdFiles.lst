@@ -7,7 +7,6 @@ com\yottachain\models\viewModels\TransactionCreatedViewModel.class
 com\yottachain\services\interfaces\TransactionService.class
 com\yottachain\YottachainNodeApplication.class
 com\yottachain\controllers\TransactionsController.class
-com\yottachain\controllers\BlocksController$1.class
 com\yottachain\models\bindingModels\TransactionBindingModel.class
 com\yottachain\p2p\Peer.class
 com\yottachain\controllers\InfoController.class
@@ -23,3 +22,4 @@ com\yottachain\controllers\NodeController.class
 com\yottachain\services\implementations\NodeServiceImpl.class
 com\yottachain\services\implementations\TransactionServiceImpl.class
 com\yottachain\p2p\PeerManager.class
+com\yottachain\services\implementations\NodeServiceImpl$2.class

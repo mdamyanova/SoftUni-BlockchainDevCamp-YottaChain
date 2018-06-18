@@ -18,17 +18,8 @@ public class Block {
     public Block() {
     }
 
+    public void generateHashes() {
 
-    public void GenerateHashes() {
-
-    }
-
-    // TODO
-    @Override
-    public String toString() {
-        return "Block{" +
-                "index=" + index +
-                '}';
     }
 
     public int getIndex() {

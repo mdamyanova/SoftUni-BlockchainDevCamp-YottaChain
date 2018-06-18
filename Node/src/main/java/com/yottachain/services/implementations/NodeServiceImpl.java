@@ -6,19 +6,20 @@ import com.yottachain.models.viewModels.NodeInfoViewModel;
 import com.yottachain.models.viewModels.TransactionCreatedViewModel;
 import com.yottachain.models.viewModels.TransactionViewModel;
 import com.yottachain.services.interfaces.NodeService;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.lang.reflect.Type;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class NodeServiceImpl implements NodeService {
 
-    //private ModelMapper mapper;
+    private ModelMapper mapper;
     private List<Block> blockchain;
 
     public NodeServiceImpl() {
-       // this.mapper = mapper;
+        this.mapper = new ModelMapper();
         this.blockchain = new List<Block>() {
             @Override
             public int size() {
@@ -139,32 +140,30 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public NodeInfoViewModel getInfo() {
+        // TODO
         NodeInfoViewModel model = new NodeInfoViewModel(
                 0, "TEST", 4444,
                 "http://test.test", null, null, 3);
-        // TODO - Create new object from type NodeInfoViewModel and return it
         return model;
     }
 
     @Override
     public List<BlockViewModel> getAllBlocks() {
-
-        //List<Block> blocks = this.nodeRepository.findAll();
-        // TODO - Map blocks to BlockViewModel
-        // TODO - Return them as list
-
-        return null;
+        Type targetListType = new TypeToken<List<BlockViewModel>>() {}.getType();
+        List<BlockViewModel> allBlocks = blockchain.size() > 0 ?
+                mapper.map(blockchain, targetListType) : Collections.emptyList();
+        return allBlocks;
     }
 
     @Override
     public BlockViewModel getBlock(int blockIndex) throws Exception {
         if (blockIndex < 0 || blockIndex > blockchain.size()) {
-            throw new Exception(); // TODO - Make custom exception for Block not found
+            throw new Exception("No such block"); // TODO - Make custom exception for Block not found
         }
 
-        // TODO - Find block from blockchain
-        // TODO - Get block view model and return it
-        return null;
+        Block block = blockchain.stream().filter(x -> x.getIndex() == blockIndex).findFirst().get();
+
+        return mapper.map(block, BlockViewModel.class);
     }
 
     @Override

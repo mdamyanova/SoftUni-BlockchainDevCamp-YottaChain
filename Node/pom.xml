@@ -37,6 +37,11 @@
             <artifactId>json-path</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.modelmapper.extensions</groupId>
+            <artifactId>modelmapper-spring</artifactId>
+            <version>0.6.5</version>
+        </dependency>
     </dependencies>
 
     <properties>
