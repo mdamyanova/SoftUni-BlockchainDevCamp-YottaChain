@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.0",
-    "signature": "c7f2357c3da682fde47534fd1dfb2d6016dc96e8"
+    "signature": "393a5a6850154affd741c7bec8abbbbfd5a85ea3"
   },
   "compilationOptions": {},
   "targets": {
@@ -10,6 +10,7 @@
         "dependencies": {
           "BouncyCastle": "1.8.2",
           "Cryptography.ECDSA.Secp256K1": "1.1.0",
+          "Microsoft.Net.Http": "2.2.29",
           "Newtonsoft.Json": "11.0.2",
           "SharpZipLib": "0.86.0",
           "System.Text.Encoding.CodePages": "4.5.0"
@@ -26,6 +27,22 @@
       "Cryptography.ECDSA.Secp256K1/1.1.0": {
         "runtime": {
           "lib/netstandard2.0/Cryptography.ECDSA.dll": {}
+        }
+      },
+      "Microsoft.Bcl/1.1.10": {
+        "dependencies": {
+          "Microsoft.Bcl.Build": "1.0.14"
+        }
+      },
+      "Microsoft.Bcl.Build/1.0.14": {},
+      "Microsoft.Net.Http/2.2.29": {
+        "dependencies": {
+          "Microsoft.Bcl": "1.1.10",
+          "Microsoft.Bcl.Build": "1.0.14"
+        },
+        "runtime": {
+          "lib/net45/System.Net.Http.Extensions.dll": {},
+          "lib/net45/System.Net.Http.Primitives.dll": {}
         }
       },
       "Newtonsoft.Json/11.0.2": {
@@ -78,6 +95,27 @@
       "sha512": "sha512-tssmBuKHrZO4zQHcDlWrZq6qRKl9qwepXl/9NhBPZltv8NWwwhv5HNYzt/c9vTlq+g5YJDv2NV3XndeNZgLd8Q==",
       "path": "cryptography.ecdsa.secp256k1/1.1.0",
       "hashPath": "cryptography.ecdsa.secp256k1.1.1.0.nupkg.sha512"
+    },
+    "Microsoft.Bcl/1.1.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-+tTqoh/M1pyL8El3qLy30EcwnAtyvFoDZJtdG9Cbg/WdFbh4N8kyrq198XHuEL7lnJbeD0DRO8jcX5IIOh05cQ==",
+      "path": "microsoft.bcl/1.1.10",
+      "hashPath": "microsoft.bcl.1.1.10.nupkg.sha512"
+    },
+    "Microsoft.Bcl.Build/1.0.14": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-cDLKSvNvRa519hplsbSoYqO69TjdDIhfjtKUM0g20/nVROoWsGav9KCI9HtnGjLmdV1+TcUUDhbotcllibjPEA==",
+      "path": "microsoft.bcl.build/1.0.14",
+      "hashPath": "microsoft.bcl.build.1.0.14.nupkg.sha512"
+    },
+    "Microsoft.Net.Http/2.2.29": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-fc4CPEewJ30Xgal+fSq1lYIBt582A7eKlAL7O4HXiYAiTp2VTnA4osSvk7T2n8aS4xTCPVJusQk3yKLT0XSpkg==",
+      "path": "microsoft.net.http/2.2.29",
+      "hashPath": "microsoft.net.http.2.2.29.nupkg.sha512"
     },
     "Newtonsoft.Json/11.0.2": {
       "type": "package",
