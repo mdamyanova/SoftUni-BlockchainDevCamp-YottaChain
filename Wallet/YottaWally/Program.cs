@@ -541,8 +541,7 @@ namespace YottaWally
             string address = ReadLine();
             try
             {
-                //string responseString = await client.GetStringAsync($"localhost:8080/address/{address}/transactions");
-                string responseString = await client.GetStringAsync($"https://stormy-everglades-34766.herokuapp.com/address/{address}/transactions");
+                string responseString = await client.GetStringAsync($"localhost:8080/address/{address}/transactions");
                 List<Transaction> transactionHistory = JsonConvert.DeserializeObject<List<Transaction>>(responseString);
                 if (transactionHistory.Count > 0) {
                     foreach (var transaction in transactionHistory)
