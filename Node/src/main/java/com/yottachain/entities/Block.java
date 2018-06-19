@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.util.*;
 
 public class Block {
+
     private int index;
     private List<Transaction> transactions;
     private long difficulty;

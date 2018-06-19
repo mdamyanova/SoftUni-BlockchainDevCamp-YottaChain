@@ -7,7 +7,6 @@ import java.util.List;
 
 public class NodeInfoViewModel {
 
-
     private int nodeId;
     private String host;
     private int port;
@@ -16,42 +15,59 @@ public class NodeInfoViewModel {
     private List<Block> chain;
     private int chainId;
 
-    public NodeInfoViewModel(int nodeId, String host, int port, String url,
-                                List<Peer> peers, List<Block> chain, int chainId) {
-        this.nodeId = nodeId;
-        this.host = host;
-        this.port = port;
-        this.url = url;
-        this.peers = peers;
-        this.chain = chain;
-        this.chainId = chainId;
-    }
-
     public int getNodeId() {
         return nodeId;
+    }
+
+    public void setNodeId(int nodeId) {
+        this.nodeId = nodeId;
     }
 
     public String getHost() {
         return host;
     }
 
+    public void setHost(String host) {
+        this.host = host;
+    }
+
     public int getPort() {
         return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public String getUrl() {
         return url;
     }
 
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     public List<Peer> getPeers() {
         return peers;
+    }
+
+    public void setPeers(List<Peer> peers) {
+        this.peers = peers;
     }
 
     public List<Block> getChain() {
         return chain;
     }
 
+    public void setChain(List<Block> chain) {
+        this.chain = chain;
+    }
+
     public int getChainId() {
         return chainId;
+    }
+
+    public void setChainId(int chainId) {
+        this.chainId = chainId;
     }
 }

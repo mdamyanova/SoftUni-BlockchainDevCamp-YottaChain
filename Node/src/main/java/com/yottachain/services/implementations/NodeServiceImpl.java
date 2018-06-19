@@ -18,7 +18,7 @@ import java.util.*;
 public class NodeServiceImpl implements NodeService {
 
     private ModelMapper mapper;
-    private List<Block> blockchain;
+    private final List<Block> blockchain;
 
     public NodeServiceImpl() {
         this.mapper = new ModelMapper();
@@ -29,9 +29,15 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public NodeInfoViewModel getInfo() {
         // TODO
-        NodeInfoViewModel model = new NodeInfoViewModel(
-                0, "TEST", 4444,
-                "http://test.test", null, null, 3);
+        NodeInfoViewModel model = new NodeInfoViewModel();
+        model.setNodeId(0);
+        model.setHost("localhost");
+        model.setPort(8080);
+        model.setUrl("http://test.test");
+        model.setPeers(new ArrayList<>());
+        model.setChain(new ArrayList<>());
+        model.setChainId(0);
+
         return model;
     }
 
@@ -48,14 +54,13 @@ public class NodeServiceImpl implements NodeService {
             throw new Exception("No such block"); // TODO - Make custom exception for Block not found
         }
 
-        Block block = blockchain.stream().filter(x -> x.getIndex() == blockIndex).findFirst().orElse(null);
+        Block block = blockchain.get(blockIndex);
 
         if (block == null) {
           throw new Exception("");
         }
 
         return mapper.map(block, BlockViewModel.class);
-
     }
 
     @Override
