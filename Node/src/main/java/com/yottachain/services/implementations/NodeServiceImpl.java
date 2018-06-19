@@ -3,14 +3,17 @@ package com.yottachain.services.implementations;
 import com.yottachain.entities.Address;
 import com.yottachain.entities.Block;
 import com.yottachain.entities.Transaction;
+import com.yottachain.models.bindingModels.TransactionBindingModel;
 import com.yottachain.models.viewModels.*;
 import com.yottachain.services.interfaces.NodeService;
 import com.yottachain.services.interfaces.TransactionService;
+import com.yottachain.utils.Helpers;
 import org.bouncycastle.util.encoders.Hex;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 
 import java.lang.reflect.Type;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,12 +22,16 @@ public class NodeServiceImpl implements NodeService {
     private ModelMapper mapper;
     private TransactionService transactionService;
     private ConcurrentHashMap<String, Transaction> pendingTransactionsById;
+    private ConcurrentHashMap<String, Transaction> confirmedTransactionsById;
+    private List<Address> addresses; // TODO
     private final List<Block> blockchain;
 
     public NodeServiceImpl() {
         this.mapper = new ModelMapper();
         this.transactionService = new TransactionServiceImpl();
         this.pendingTransactionsById = new ConcurrentHashMap<>();
+        this.confirmedTransactionsById = new ConcurrentHashMap<>();
+        this.addresses = new ArrayList<>();
         this.blockchain = new ArrayList<>();
         this.blockchain.add(generateGenesisBlock());
     }
@@ -64,13 +71,10 @@ public class NodeServiceImpl implements NodeService {
         if (blockIndex < 0 || blockIndex > blockchain.size()) {
             throw new Exception("No such block"); // TODO - Make custom exception for Block not found
         }
-
-        Block block = blockchain.get(blockIndex);
-
+        Block block = blockchain.stream().filter(x -> x.getIndex() == blockIndex).findFirst().orElse(null);
         if (block == null) {
           throw new Exception("");
         }
-
         return mapper.map(block, BlockViewModel.class);
     }
 
@@ -87,18 +91,16 @@ public class NodeServiceImpl implements NodeService {
         genesis.setPreviousBlockHash("NONE");
         genesis.setMinedBy(minedBy);
         genesis.setBlockDataHash(Hex.toHexString("TODO".getBytes()));
-        genesis.setNonce(123456789L);
         genesis.setCreatedOn(0L);
         genesis.setBlockDataHash(Hex.toHexString("TODO".getBytes()));
         return genesis;
     }
 
     @Override
-    public List<TransactionViewModel> getPendingTransactions() {
-        // TODO
+    public List<TransactionViewModel> getTransactions(boolean isConfirmed) {
         List<TransactionViewModel> model = new ArrayList<>();
         for (Map.Entry<String, Transaction> transaction : pendingTransactionsById.entrySet()) {
-            if (!transaction.getValue().isConfirmed()) {
+            if (isConfirmed == transaction.getValue().isConfirmed()) {
                 model.add(mapper.map(transaction.getValue(), TransactionViewModel.class));
             }
         }
@@ -106,17 +108,55 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public TransactionViewModel getTransactionInfo(String transactionHash) {
-        return null;
+    public TransactionViewModel getTransactionByHash(String transactionHash) {
+        // TODO - this get() ?
+        Transaction transaction = pendingTransactionsById.entrySet().stream()
+                .filter(x -> x.getValue().getTransactionHash().equals(transactionHash))
+                .findFirst().get().getValue();
+
+        if (transaction == null) {
+            transaction = confirmedTransactionsById.entrySet().stream()
+                    .filter(x -> x.getValue().getTransactionHash().equals(transactionHash))
+                    .findFirst().get().getValue();
+        }
+        return mapper.map(transaction, TransactionViewModel.class);
     }
 
     @Override
-    public TransactionCreatedViewModel addTransaction(TransactionViewModel transaction) {
-        // TODO - Create transaction from the service
-        // TODO - Validate transaction from the service
-        // TODO - Throw exception or check - if non exist, add to blockchain
-        // TODO - Return TransactionCreatedViewModel :))
+    public List<BalanceViewModel> getBalances() {
+        Type targetListType = new TypeToken<List<BalanceViewModel>>() {}.getType();
+        return mapper.map(addresses, targetListType);
+    }
 
-        return null;
+    @Override
+    public List<TransactionViewModel> getTransactionsByAddress(String address) {
+        List<TransactionViewModel> model = new ArrayList<>();
+        return null; //TODO
+    }
+
+    @Override
+    public TransactionCreatedViewModel addTransaction(TransactionBindingModel model) throws Exception {
+        Transaction transaction = transactionService.create(model);
+
+        // TODO add address to addresses !!! - hashmap?
+
+        boolean isValid = transactionService.validate(transaction);
+
+        if (!isValid) {
+            throw new Exception("Invalid transaction"); // TODO - Custom exception
+        }
+
+        if (confirmedTransactionsById.containsKey(transaction.getTransactionHash())) {
+            throw new Exception("Transaction is already confirmed"); // TODO - Custom exception
+        }
+
+        if (!pendingTransactionsById.containsKey(transaction.getTransactionHash())) {
+            pendingTransactionsById.put(transaction.getTransactionHash(), transaction);
+        }
+
+        TransactionCreatedViewModel createdTrModel = new TransactionCreatedViewModel();
+        createdTrModel.setCreatedOn(Helpers.toISO8601UTC(ZonedDateTime.now()));
+        createdTrModel.setTransactionHash(transaction.getTransactionHash());
+        return createdTrModel;
     }
 }

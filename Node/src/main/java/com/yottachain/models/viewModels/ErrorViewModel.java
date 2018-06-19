@@ -1,7 +1,6 @@
 package com.yottachain.models.viewModels;
 
-public class ResetChainViewModel {
-
+public class ErrorViewModel {
     private String message;
 
     public String getMessage() {

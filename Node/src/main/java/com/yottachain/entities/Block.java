@@ -13,7 +13,6 @@ public class Block {
     private String previousBlockHash;
     private Address minedBy;
     private String blockDataHash;
-    private long nonce;
     private long createdOn;
     private String blockHash;
 
@@ -22,15 +21,7 @@ public class Block {
     }
 
     public int getIndex() {
-        return index;
-    }
-
-    public String getPreviousBlockHash() {
-        return previousBlockHash;
-    }
-
-    public String getBlockHash() {
-        return blockHash;
+        return this.index;
     }
 
     public void setIndex(int index) {
@@ -38,7 +29,7 @@ public class Block {
     }
 
     public List<Transaction> getTransactions() {
-        return transactions;
+        return this.transactions;
     }
 
     public void setTransactions(List<Transaction> transactions) {
@@ -46,11 +37,15 @@ public class Block {
     }
 
     public long getDifficulty() {
-        return difficulty;
+        return this.difficulty;
     }
 
     public void setDifficulty(long difficulty) {
         this.difficulty = difficulty;
+    }
+
+    public String getPreviousBlockHash() {
+        return this.previousBlockHash;
     }
 
     public void setPreviousBlockHash(String previousBlockHash) {
@@ -58,7 +53,7 @@ public class Block {
     }
 
     public Address getMinedBy() {
-        return minedBy;
+        return this.minedBy;
     }
 
     public void setMinedBy(Address minedBy) {
@@ -66,27 +61,23 @@ public class Block {
     }
 
     public String getBlockDataHash() {
-        return blockDataHash;
+        return this.blockDataHash;
     }
 
     public void setBlockDataHash(String blockDataHash) {
         this.blockDataHash = blockDataHash;
     }
 
-    public long getNonce() {
-        return nonce;
-    }
-
-    public void setNonce(long nonce) {
-        this.nonce = nonce;
-    }
-
     public long getCreatedOn() {
-        return createdOn;
+        return this.createdOn;
     }
 
     public void setCreatedOn(long createdOn) {
         this.createdOn = createdOn;
+    }
+
+    public String getBlockHash() {
+        return this.blockHash;
     }
 
     public void setBlockHash(String blockHash) {

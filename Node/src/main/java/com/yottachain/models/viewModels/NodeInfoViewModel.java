@@ -16,7 +16,7 @@ public class NodeInfoViewModel {
     private int chainId;
 
     public int getNodeId() {
-        return nodeId;
+        return this.nodeId;
     }
 
     public void setNodeId(int nodeId) {
@@ -24,7 +24,7 @@ public class NodeInfoViewModel {
     }
 
     public String getHost() {
-        return host;
+        return this.host;
     }
 
     public void setHost(String host) {
@@ -32,7 +32,7 @@ public class NodeInfoViewModel {
     }
 
     public int getPort() {
-        return port;
+        return this.port;
     }
 
     public void setPort(int port) {
@@ -40,7 +40,7 @@ public class NodeInfoViewModel {
     }
 
     public String getUrl() {
-        return url;
+        return this.url;
     }
 
     public void setUrl(String url) {
@@ -48,7 +48,7 @@ public class NodeInfoViewModel {
     }
 
     public List<Peer> getPeers() {
-        return peers;
+        return this.peers;
     }
 
     public void setPeers(List<Peer> peers) {
@@ -56,7 +56,7 @@ public class NodeInfoViewModel {
     }
 
     public List<Block> getChain() {
-        return chain;
+        return this.chain;
     }
 
     public void setChain(List<Block> chain) {
@@ -64,7 +64,7 @@ public class NodeInfoViewModel {
     }
 
     public int getChainId() {
-        return chainId;
+        return this.chainId;
     }
 
     public void setChainId(int chainId) {

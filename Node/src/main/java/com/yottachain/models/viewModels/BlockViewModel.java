@@ -19,7 +19,7 @@ public class BlockViewModel {
     private String blockHash;
 
     public int getIndex() {
-        return index;
+        return this.index;
     }
 
     public void setIndex(int index) {
@@ -27,7 +27,7 @@ public class BlockViewModel {
     }
 
     public List<Transaction> getTransactions() {
-        return transactions;
+        return this.transactions;
     }
 
     public void setTransactions(List<Transaction> transactions) {
@@ -35,7 +35,7 @@ public class BlockViewModel {
     }
 
     public long getDifficulty() {
-        return difficulty;
+        return this.difficulty;
     }
 
     public void setDifficulty(long difficulty) {
@@ -43,7 +43,7 @@ public class BlockViewModel {
     }
 
     public String getPreviousBlockHash() {
-        return previousBlockHash;
+        return this.previousBlockHash;
     }
 
     public void setPreviousBlockHash(String previousBlockHash) {
@@ -51,7 +51,7 @@ public class BlockViewModel {
     }
 
     public Address getMinedBy() {
-        return minedBy;
+        return this.minedBy;
     }
 
     public void setMinedBy(Address minedBy) {
@@ -59,7 +59,7 @@ public class BlockViewModel {
     }
 
     public String getBlockDataHash() {
-        return blockDataHash;
+        return this.blockDataHash;
     }
 
     public void setBlockDataHash(String blockDataHash) {
@@ -67,7 +67,7 @@ public class BlockViewModel {
     }
 
     public long getNonce() {
-        return nonce;
+        return this.nonce;
     }
 
     public void setNonce(long nonce) {
@@ -75,7 +75,7 @@ public class BlockViewModel {
     }
 
     public Date getCreatedOn() {
-        return createdOn;
+        return this.createdOn;
     }
 
     public void setCreatedOn(Date createdOn) {
@@ -83,7 +83,7 @@ public class BlockViewModel {
     }
 
     public String getBlockHash() {
-        return blockHash;
+        return this.blockHash;
     }
 
     public void setBlockHash(String blockHash) {

@@ -11,10 +11,10 @@ public class Address {
     }
 
     public String getAddressId() {
-        return addressId;
+        return this.addressId;
     }
 
     public long getAmount() {
-        return amount;
+        return this.amount;
     }
 }

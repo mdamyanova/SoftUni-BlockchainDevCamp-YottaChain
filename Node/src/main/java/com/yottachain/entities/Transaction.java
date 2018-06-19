@@ -3,7 +3,7 @@ package com.yottachain.entities;
 import java.util.List;
 
 public class Transaction {
-    // TODO - Create
+
     private Address from;
     private Address to;
     private long amount;
@@ -12,11 +12,13 @@ public class Transaction {
     private String transactionData;
     private String senderPublicKey;
     private List<String> senderSignature;
-    private String transactionDataHash;
+    private String transactionHash;
+    private int minedInBlockIndex;
     private boolean isConfirmed;
+    private long nonce;
 
     public Address getFrom() {
-        return from;
+        return this.from;
     }
 
     public void setFrom(Address from) {
@@ -24,7 +26,7 @@ public class Transaction {
     }
 
     public Address getTo() {
-        return to;
+        return this.to;
     }
 
     public void setTo(Address to) {
@@ -32,7 +34,7 @@ public class Transaction {
     }
 
     public long getAmount() {
-        return amount;
+        return this.amount;
     }
 
     public void setAmount(long amount) {
@@ -40,7 +42,7 @@ public class Transaction {
     }
 
     public int getFee() {
-        return fee;
+        return this.fee;
     }
 
     public void setFee(int fee) {
@@ -48,7 +50,7 @@ public class Transaction {
     }
 
     public long getCreatedOn() {
-        return createdOn;
+        return this.createdOn;
     }
 
     public void setCreatedOn(long createdOn) {
@@ -56,7 +58,7 @@ public class Transaction {
     }
 
     public String getTransactionData() {
-        return transactionData;
+        return this.transactionData;
     }
 
     public void setTransactionData(String transactionData) {
@@ -64,7 +66,7 @@ public class Transaction {
     }
 
     public String getSenderPublicKey() {
-        return senderPublicKey;
+        return this.senderPublicKey;
     }
 
     public void setSenderPublicKey(String senderPublicKey) {
@@ -72,29 +74,42 @@ public class Transaction {
     }
 
     public List<String> getSenderSignature() {
-        return senderSignature;
+        return this.senderSignature;
     }
 
     public void setSenderSignature(List<String> senderSignature) {
         this.senderSignature = senderSignature;
     }
 
-    public String getTransactionDataHash() {
-        return transactionDataHash;
+    public String getTransactionHash() {
+        return this.transactionHash;
     }
 
-    public void setTransactionDataHash(String transactionDataHash) {
-        this.transactionDataHash = transactionDataHash;
+    public void setTransactionHash(String transactionHash) {
+        this.transactionHash = transactionHash;
     }
 
     public boolean isConfirmed() {
-        return isConfirmed;
+        return this.isConfirmed;
     }
 
     public void setConfirmed(boolean confirmed) {
         isConfirmed = confirmed;
     }
 
-    //long Nonce
-    //int MinedInBlockIndex
+    public int getMinedInBlockIndex() {
+        return this.minedInBlockIndex;
+    }
+
+    public void setMinedInBlockIndex(int minedInBlockIndex) {
+        this.minedInBlockIndex = minedInBlockIndex;
+    }
+
+    public long getNonce() {
+        return nonce;
+    }
+
+    public void setNonce(long nonce) {
+        this.nonce = nonce;
+    }
 }

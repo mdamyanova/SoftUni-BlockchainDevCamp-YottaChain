@@ -17,7 +17,7 @@ public class TransactionViewModel {
     private String transactionDataHash;
 
     public Address getFrom() {
-        return from;
+        return this.from;
     }
 
     public void setFrom(Address from) {
@@ -25,7 +25,7 @@ public class TransactionViewModel {
     }
 
     public Address getTo() {
-        return to;
+        return this.to;
     }
 
     public void setTo(Address to) {
@@ -33,7 +33,7 @@ public class TransactionViewModel {
     }
 
     public long getAmount() {
-        return amount;
+        return this.amount;
     }
 
     public void setAmount(long amount) {
@@ -41,7 +41,7 @@ public class TransactionViewModel {
     }
 
     public int getFee() {
-        return fee;
+        return this.fee;
     }
 
     public void setFee(int fee) {
@@ -49,7 +49,7 @@ public class TransactionViewModel {
     }
 
     public long getCreatedOn() {
-        return createdOn;
+        return this.createdOn;
     }
 
     public void setCreatedOn(long createdOn) {
@@ -57,7 +57,7 @@ public class TransactionViewModel {
     }
 
     public String getTransactionData() {
-        return transactionData;
+        return this.transactionData;
     }
 
     public void setTransactionData(String transactionData) {
@@ -65,7 +65,7 @@ public class TransactionViewModel {
     }
 
     public String getSenderPublicKey() {
-        return senderPublicKey;
+        return this.senderPublicKey;
     }
 
     public void setSenderPublicKey(String senderPublicKey) {
@@ -73,7 +73,7 @@ public class TransactionViewModel {
     }
 
     public List<String> getSenderSignature() {
-        return senderSignature;
+        return this.senderSignature;
     }
 
     public void setSenderSignature(List<String> senderSignature) {
@@ -81,7 +81,7 @@ public class TransactionViewModel {
     }
 
     public String getTransactionDataHash() {
-        return transactionDataHash;
+        return this.transactionDataHash;
     }
 
     public void setTransactionDataHash(String transactionDataHash) {

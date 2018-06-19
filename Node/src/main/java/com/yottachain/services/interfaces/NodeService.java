@@ -1,6 +1,7 @@
 package com.yottachain.services.interfaces;
 
 import com.yottachain.entities.Block;
+import com.yottachain.models.bindingModels.TransactionBindingModel;
 import com.yottachain.models.viewModels.*;
 
 import java.util.List;
@@ -12,7 +13,9 @@ public interface NodeService {
     List<BlockViewModel> getAllBlocks();
     BlockViewModel getBlock(int blockIndex) throws Exception;
     Block generateGenesisBlock();
-    List<TransactionViewModel> getPendingTransactions();
-    TransactionViewModel getTransactionInfo(String transactionHash);
-    TransactionCreatedViewModel addTransaction(TransactionViewModel transaction);
+    List<TransactionViewModel> getTransactions(boolean isConfirmed);
+    TransactionViewModel getTransactionByHash(String transactionHash);
+    List<BalanceViewModel> getBalances();
+    List<TransactionViewModel> getTransactionsByAddress(String address);
+    TransactionCreatedViewModel addTransaction(TransactionBindingModel model) throws Exception;
 }

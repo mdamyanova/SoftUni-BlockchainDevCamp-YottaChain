@@ -1,15 +1,22 @@
 package com.yottachain.services.implementations;
 
 import com.yottachain.entities.Transaction;
+import com.yottachain.models.bindingModels.TransactionBindingModel;
 import com.yottachain.models.viewModels.TransactionViewModel;
 import com.yottachain.services.interfaces.TransactionService;
 
 public class TransactionServiceImpl implements TransactionService {
 
     @Override
-    public Transaction create(TransactionViewModel transaction) {
-        // TODO - Create new object from type Transaction and return it
-        return null;
+    public Transaction create(TransactionBindingModel model) {
+        Transaction transaction = new Transaction();
+        transaction.setFrom(model.getFrom());
+        transaction.setTo(model.getTo());
+        transaction.setAmount(model.getAmount());
+        transaction.setNonce(model.getNonce());
+        transaction.setSenderPublicKey(model.getSenderPublicKey());
+        transaction.setSenderSignature(model.getSenderSignature());
+        return transaction;
     }
 
     @Override
