@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using System.IO;
-using System.Reflection;
+using System.Net.Http;
 
 namespace YottaWally
 {
@@ -18,6 +18,7 @@ namespace YottaWally
     {
         private static RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider(); ///Crypto Service Provider
         private static Secp256K1Manager secp256 = new Secp256K1Manager(); ///Secp256k1 Manager
+        private static readonly HttpClient client = new HttpClient(); ///Http Client
 
         static string openedWalletName = string.Empty; //The Name of the Wallet you have Opened
         static int startCounter = 0; //Shows how many times was the Main Method Called
@@ -105,13 +106,14 @@ namespace YottaWally
                         WriteLine($"\"{input}\" is not recognized as a command");
                     }
 
-                    switch (input)
+                    switch (input) //In-wallet Main Logic
                     {
                         case "balance":
+                            GetBalance();
                             break;
                         case "history":
                             break;
-                        case "send":
+                        case "send": 
                             break;
                     }
                 }
@@ -139,7 +141,7 @@ namespace YottaWally
             WriteLine($">>> {str}");
         }
 
-        private static string GetHiddenConsoleInput() //Hide input while typing
+        private static string GetHiddenConsoleInput() ///Hide input while typing
         {
             StringBuilder input = new StringBuilder();
             while (true)
@@ -353,7 +355,6 @@ namespace YottaWally
                         {
                             Write(">>> ");
                             privateKeys.Add(StringToByteArray(ReadLine()));
-                            WriteLine();
                         }
                     }
                     catch
@@ -548,6 +549,55 @@ namespace YottaWally
             else
             {
                 Print("No wallets found on this computer!");
+            }
+        }
+
+        static async void GetBalance() ///Gets the Balance for 5 YottaWallet Addresses
+        {
+            try
+            {
+                List<string> addresses = new List<string>(); //List with all addresses in the Wallet
+                string responseString = await client.GetStringAsync("localhost:8080/balances");
+                Balances balances = JsonConvert.DeserializeObject<Balances>(responseString);
+                WalletData walletData = new WalletData();
+
+                if (!File.Exists($@"Wallets/{openedWalletName}.json"))
+                {
+                    Print("Write your 5 Addresses:");
+                    for (int i = 0; i < 5; i++)
+                    {
+                        Write(">>> ");
+                        addresses.Add(ReadLine());
+                    }
+                }
+
+                else
+                {
+                    using (StreamReader r = new StreamReader($@"Wallets/{openedWalletName}.json"))
+                    {
+                        string json = r.ReadToEnd();
+                        walletData = JsonConvert.DeserializeObject<WalletData>(json);
+                        for (int i = 0; i < 5; i++)
+                        {
+                            addresses.Add(walletData.Addresses[i]);
+                        }
+                    }
+                }
+                for (int i = 0; i < 5; i++)
+                {
+                    try
+                    {
+                        Print($"\"{addresses[i]}\" : {balances.AddressBalances[addresses[i]]}");
+                    }
+                    catch
+                    {
+                        Print($"\"{addresses[i]}\" : 0");
+                    }
+                }
+            }
+            catch
+            {
+                Print("ERROR! COULD NOT GET BALANCES!");
             }
         }
 
