@@ -11,6 +11,8 @@ using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using System.IO;
 using System.Net.Http;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace YottaWally
 {
@@ -23,8 +25,11 @@ namespace YottaWally
         static string openedWalletName = string.Empty; //The Name of the Wallet you have Opened
         static int startCounter = 0; //Shows how many times was the Main Method Called
         static bool? loadWallet = null; //Indicates Whether a Wallet is Loaded
-
         static void Main()
+        {
+            MainAsync();
+        }
+        static async void MainAsync() ///The Async Main Method
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); //Encoding
 
@@ -63,6 +68,11 @@ namespace YottaWally
                 {
                     case "create":
                         if (!CreateWallet()) Print("Try to create a Wallet again!"); //Prompts to create new wallet if the wallet is not Created
+                        else
+                        {
+                            loadWallet = true;
+                            goto outOfWhile;
+                        }
                         break;
 
                     case "mywallets":
@@ -92,7 +102,7 @@ namespace YottaWally
                 
                 while (true)
                 {
-                    Write(">>> [\"Balance\", \"Send\", \"Exit\"]: ");
+                    Write(">>> [\"Balance\", \"Send\", \"History\", \"Exit\"]: ");
                     input = ReadLine();
 
                     if (input.ToLower() == "exit")
@@ -109,9 +119,25 @@ namespace YottaWally
                     switch (input) //In-wallet Main Logic
                     {
                         case "balance":
-                            GetBalance();
+                            Write(">>> [\"Address\", \"Wallet\"]: ");
+
+                            string cmd = ReadLine();
+                            if (cmd.ToLower() == "wallet")
+                            { 
+                                var task = FillBalancesClass();
+                                task.Wait(); //Waits for the task to Complete
+                            }
+
+                            else if (cmd.ToLower() == "address")
+                            {
+                                var task = GetBalanceByAddress();
+                                task.Wait(); //Waits for the task to Complete
+                            }
+
                             break;
                         case "history":
+                            var historyTask = GetTransactionHistory();
+                            historyTask.Wait(); //Waits for the task to Complete
                             break;
                         case "send": 
                             break;
@@ -189,7 +215,7 @@ namespace YottaWally
         {
             Write(">>> Type Wallet Name: ");
             string walletName = ReadLine();
-            if (Directory.Exists($@"Wallets/{walletName}"))
+            if (File.Exists($@"Wallets/{walletName}.zip")|| File.Exists($@"Wallets/{walletName}.json"))
             {
                 Print($"ERROR! WALLET \"{walletName.ToUpper()}\" ALREADY EXISTS!");
                 return false;
@@ -293,32 +319,40 @@ namespace YottaWally
 
         static bool LoadWallet() ///Loads an existing wallet
         {
-            WalletData walletData = new WalletData();
-            Write(">>> Place .json file in \"Wallets/\" with the name of the Wallet on it!");
-            ReadKey();
-            WriteLine();
-            Write(">>> Enter Wallet Name: ");
-            string walletName = ReadLine();
-            if (!File.Exists($@"Wallets/{walletName}.json"))
+            try
             {
-                Print($"ERROR! THERE IS NO WALLET NAMED \"{walletName.ToUpper()}\"!");
+                WalletData walletData = new WalletData();
+                Write(">>> Place .json file in \"Wallets/\" with the name of the Wallet on it!");
+                ReadKey();
+                WriteLine();
+                Write(">>> Enter Wallet Name: ");
+                string walletName = ReadLine();
+                if (!File.Exists($@"Wallets/{walletName}.json"))
+                {
+                    Print($"ERROR! THERE IS NO WALLET NAMED \"{walletName.ToUpper()}\"!");
+                    return false;
+                }
+                Write($">>> Enter Wallet \"{walletName}\"'s Password: ");
+                string password = GetHiddenConsoleInput();
+                WriteLine();
+                using (StreamReader r = new StreamReader($@"Wallets/{walletName}.json"))
+                {
+                    string json = r.ReadToEnd();
+                    walletData = JsonConvert.DeserializeObject<WalletData>(json);
+                }
+                if (!(walletData.PasswordHash == GetPasswordHash(password)))
+                {
+                    Print("ERROR! PASSWORD IS NOT CORRECT!");
+                    return false;
+                }
+                openedWalletName = walletName;
+                return true;
+            }
+            catch
+            {
+                Print("ERROR! COULD NOT LOAD WALLET!");
                 return false;
             }
-            Write($">>> Enter Wallet \"{walletName}\"'s Password: ");
-            string password = GetHiddenConsoleInput();
-            WriteLine();
-            using (StreamReader r = new StreamReader($@"Wallets/{walletName}.json"))
-            {
-                string json = r.ReadToEnd();
-                walletData = JsonConvert.DeserializeObject<WalletData>(json);
-            }
-            if (!(walletData.PasswordHash == GetPasswordHash(password)))
-            {
-                Print("ERROR! PASSWORD IS NOT CORRECT!");
-                return false;
-            }
-            openedWalletName = walletName;
-            return true;
         }
 
         static bool RecoverWallet() ///Recovers Wallet from 5 Private Keys
@@ -410,7 +444,10 @@ namespace YottaWally
                     bool saveWallet = ReadLine().ToLower() == "y";
                     if (saveWallet)
                     {
-                        SaveToJSON(walletName, password, privateKeysString, publicKeysString, pubKeysCompressed, addresses);
+                        if(!SaveToJSON(walletName, password, privateKeysString, publicKeysString, pubKeysCompressed, addresses))
+                        {
+                            Print("ERROR! COULD NOT SAVE TO JSON FILE!");
+                        }
                     }
                 }
                 catch (Exception e)
@@ -428,7 +465,7 @@ namespace YottaWally
             }
         }
 
-        static bool SaveToJSON(string walletName, string password, List<string> privateKeys,List<string>publicKeys,List<string> pubKeysCompressed,List<string> addresses)
+        static bool SaveToJSON(string walletName, string password, List<string> privateKeys,List<string>publicKeys,List<string> pubKeysCompressed,List<string> addresses) ///Saves Wallet to an Encrypted JSON file in a ZIP Folder
         {
             if (!Directory.Exists($@"Wallets/{walletName}"))
             {
@@ -463,7 +500,83 @@ namespace YottaWally
             return sb.ToString().ToLower();
         }
 
-        static byte[] StringToByteArray(string hex)
+        static async Task FillBalancesClass() ///Fills the Balances.cs Class with Information from the Node
+        {
+            try
+            {
+                string responseString = await client.GetStringAsync("localhost:8080/balances");
+                ConcurrentDictionary<string, decimal> addressBalances = JsonConvert.DeserializeObject<ConcurrentDictionary<string, decimal>>(responseString);
+                GetBalances(new Balances(addressBalances));
+            }
+            catch
+            {
+                Print("ERROR! COULD NOT GET BALANCES!");
+            }
+        }
+
+        static async Task GetBalanceByAddress() ///Gets the Balance from the Node By the Address 
+        {
+            Write(">>> Write your address: ");
+            string address = ReadLine();
+            try
+            {
+                string responseString = await client.GetStringAsync($"localhost:8080/address/{address}/balance");
+                AddressBalance addressBalance = JsonConvert.DeserializeObject<AddressBalance>(responseString);
+
+                Print($"Address: {address}");
+                WriteLine("----------------------------------------");
+                Print($"Safe Balance: {addressBalance.safeBalance}");
+                Print($"Confirmed Balance: {addressBalance.confirmedBalance}");
+                Print($"Pending Balance: {addressBalance.confirmedBalance}");
+            }
+            catch
+            {
+                Print("ERROR! COULD NOT GET BALANCE!");
+            }
+        }
+
+        static async Task GetTransactionHistory() ///Getting All Transactions an Address did or is doing
+        {
+            Write(">>> Write down your address: ");
+            string address = ReadLine();
+            try
+            {
+                //string responseString = await client.GetStringAsync($"localhost:8080/address/{address}/transactions");
+                string responseString = await client.GetStringAsync($"https://stormy-everglades-34766.herokuapp.com/address/{address}/transactions");
+                List<Transaction> transactionHistory = JsonConvert.DeserializeObject<List<Transaction>>(responseString);
+                if (transactionHistory.Count > 0) {
+                    foreach (var transaction in transactionHistory)
+                    {
+                        WriteLine("--------------- Transaction ---------------");
+                        WriteLine($"\"From\":{transaction.from},");
+                        WriteLine($"\"To\":{transaction.to},");
+                        WriteLine($"\"Value\":{transaction.value},");
+                        WriteLine($"\"Fee\":{transaction.fee},");
+                        WriteLine($"\"Date Created\":{transaction.dateCreated},");
+                        WriteLine($"\"Data\":{transaction.data},");
+                        WriteLine($"\"Sender Public Key\":{transaction.senderPubKey},");
+                        WriteLine($"\"Transaction Data Hash\":{transaction.transactionDataHash},");
+                        WriteLine("\"SenderSignature\": [");
+                        WriteLine($"{string.Join(",\n",transaction.senderSignature)}");
+                        WriteLine("],");
+                        WriteLine($"\"Mined In Block Index\":{transaction.minedInBlockIndex},");
+                        WriteLine($"\"transferSuccessful\":{Convert.ToString(transaction.transferSuccessful)}");
+                        WriteLine("-------------------------------------------");
+                        WriteLine();
+                    }
+                }
+                else
+                {
+                    Print($"No Transactions found for this address! ({address})");
+                }
+            }
+            catch
+            {
+                Print("ERROR! COULD NOT GET HISTORY OF TRANSACTIONS!");
+            }
+        }
+
+        static byte[] StringToByteArray(string hex) ///Gets HEX string and returns it as a Byte Array
         {
             return Enumerable.Range(0, hex.Length)
                              .Where(x => x % 2 == 0)
@@ -552,13 +665,11 @@ namespace YottaWally
             }
         }
 
-        static async void GetBalance() ///Gets the Balance for 5 YottaWallet Addresses
+        static void GetBalances(Balances balances) ///Gets the Balance for 5 YottaChain Addresses
         {
             try
             {
                 List<string> addresses = new List<string>(); //List with all addresses in the Wallet
-                string responseString = await client.GetStringAsync("localhost:8080/balances");
-                Balances balances = JsonConvert.DeserializeObject<Balances>(responseString);
                 WalletData walletData = new WalletData();
 
                 if (!File.Exists($@"Wallets/{openedWalletName}.json"))
@@ -566,8 +677,8 @@ namespace YottaWally
                     Print("Write your 5 Addresses:");
                     for (int i = 0; i < 5; i++)
                     {
-                        Write(">>> ");
-                        addresses.Add(ReadLine());
+                        string address = ReadLine();
+                        addresses.Add(address);
                     }
                 }
 
@@ -583,6 +694,7 @@ namespace YottaWally
                         }
                     }
                 }
+                WriteLine();
                 for (int i = 0; i < 5; i++)
                 {
                     try
@@ -610,7 +722,7 @@ namespace YottaWally
             {
                 if (ans.ToLower() == "n")
                 {
-                    Main();
+                    MainAsync();
                 }
 
                 else Exit();

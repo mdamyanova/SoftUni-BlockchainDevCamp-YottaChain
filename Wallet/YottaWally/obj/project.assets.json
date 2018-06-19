@@ -1082,11 +1082,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\zyppy\\Desktop\\Repos\\YottaWally\\YottaWally\\YottaWally\\YottaWally.csproj",
+      "projectUniqueName": "C:\\Users\\zyppy\\Desktop\\Repos\\YottaWally\\Wallet\\YottaWally\\YottaWally.csproj",
       "projectName": "YottaWally",
-      "projectPath": "C:\\Users\\zyppy\\Desktop\\Repos\\YottaWally\\YottaWally\\YottaWally\\YottaWally.csproj",
+      "projectPath": "C:\\Users\\zyppy\\Desktop\\Repos\\YottaWally\\Wallet\\YottaWally\\YottaWally.csproj",
       "packagesPath": "C:\\Users\\zyppy\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\zyppy\\Desktop\\Repos\\YottaWally\\YottaWally\\YottaWally\\obj\\",
+      "outputPath": "C:\\Users\\zyppy\\Desktop\\Repos\\YottaWally\\Wallet\\YottaWally\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\",
