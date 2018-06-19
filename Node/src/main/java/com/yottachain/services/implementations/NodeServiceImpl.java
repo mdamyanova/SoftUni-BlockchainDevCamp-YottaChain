@@ -3,25 +3,28 @@ package com.yottachain.services.implementations;
 import com.yottachain.entities.Address;
 import com.yottachain.entities.Block;
 import com.yottachain.entities.Transaction;
-import com.yottachain.models.viewModels.BlockViewModel;
-import com.yottachain.models.viewModels.NodeInfoViewModel;
-import com.yottachain.models.viewModels.TransactionCreatedViewModel;
-import com.yottachain.models.viewModels.TransactionViewModel;
+import com.yottachain.models.viewModels.*;
 import com.yottachain.services.interfaces.NodeService;
+import com.yottachain.services.interfaces.TransactionService;
 import org.bouncycastle.util.encoders.Hex;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NodeServiceImpl implements NodeService {
 
     private ModelMapper mapper;
+    private TransactionService transactionService;
+    private ConcurrentHashMap<String, Transaction> pendingTransactionsById;
     private final List<Block> blockchain;
 
     public NodeServiceImpl() {
         this.mapper = new ModelMapper();
+        this.transactionService = new TransactionServiceImpl();
+        this.pendingTransactionsById = new ConcurrentHashMap<>();
         this.blockchain = new ArrayList<>();
         this.blockchain.add(generateGenesisBlock());
     }
@@ -37,7 +40,15 @@ public class NodeServiceImpl implements NodeService {
         model.setPeers(new ArrayList<>());
         model.setChain(new ArrayList<>());
         model.setChainId(0);
+        return model;
+    }
 
+    @Override
+    public ResetChainViewModel resetChain() {
+        this.blockchain.clear();
+        this.blockchain.add(generateGenesisBlock());
+        ResetChainViewModel model = new ResetChainViewModel();
+        model.setMessage("The chain was reset to its genesis block");
         return model;
     }
 
@@ -65,12 +76,11 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public Block generateGenesisBlock() {
-       // if (blockchain.size() != 0)
+       // if (blockchain.size() != 0) - careful here, TODO
 
         Block genesis = new Block();
         List<Transaction> transactions = new ArrayList<>();
         Address minedBy = new Address("00");
-
         genesis.setIndex(0);
         genesis.setTransactions(transactions);
         genesis.setDifficulty(1);
@@ -80,8 +90,19 @@ public class NodeServiceImpl implements NodeService {
         genesis.setNonce(123456789L);
         genesis.setCreatedOn(0L);
         genesis.setBlockDataHash(Hex.toHexString("TODO".getBytes()));
+        return genesis;
+    }
 
-        return genesis; // TODO - clever way to return ?
+    @Override
+    public List<TransactionViewModel> getPendingTransactions() {
+        // TODO
+        List<TransactionViewModel> model = new ArrayList<>();
+        for (Map.Entry<String, Transaction> transaction : pendingTransactionsById.entrySet()) {
+            if (!transaction.getValue().isConfirmed()) {
+                model.add(mapper.map(transaction.getValue(), TransactionViewModel.class));
+            }
+        }
+        return model;
     }
 
     @Override

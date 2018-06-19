@@ -10,14 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TransactionsController {
 
-    // GET Pending Transactions
-    @GetMapping("/transactions/pending")
-    public ResponseEntity<String> pending() {
-        // TODO - return list
-
-        return new ResponseEntity<String>("TODO", HttpStatus.OK);
-    }
-
     // GET Confirmed Transactions
     @GetMapping("/transactions/confirmed")
     public ResponseEntity<String> confirmed() {

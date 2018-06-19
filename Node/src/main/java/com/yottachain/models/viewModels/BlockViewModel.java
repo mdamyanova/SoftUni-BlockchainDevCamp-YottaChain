@@ -18,7 +18,6 @@ public class BlockViewModel {
     private Date createdOn;
     private String blockHash;
 
-
     public int getIndex() {
         return index;
     }

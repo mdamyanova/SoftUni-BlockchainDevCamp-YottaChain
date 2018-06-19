@@ -3,8 +3,11 @@ package com.yottachain.controllers;
 import com.yottachain.entities.Block;
 import com.yottachain.models.viewModels.BlockViewModel;
 import com.yottachain.models.viewModels.NodeInfoViewModel;
+import com.yottachain.models.viewModels.ResetChainViewModel;
+import com.yottachain.models.viewModels.TransactionViewModel;
 import com.yottachain.services.implementations.NodeServiceImpl;
 import com.yottachain.services.interfaces.NodeService;
+import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,14 +29,19 @@ public class NodeController {
 
     @RequestMapping("/")
     public String index() {
-        return "ZDR";
+        return "<h1>ZDR</h1>";
+    }
+
+    // GET Reset Chain
+    @GetMapping("/debug/reset-chain")
+    public ResponseEntity<ResetChainViewModel> reset() {
+        return new ResponseEntity<>(nodeService.resetChain(), HttpStatus.OK);
     }
 
     // GET Info
     @GetMapping("/info")
     public ResponseEntity<NodeInfoViewModel> info() {
-        NodeInfoViewModel model = nodeService.getInfo();
-        return new ResponseEntity<NodeInfoViewModel>(model, HttpStatus.OK);
+        return new ResponseEntity<>(nodeService.getInfo(), HttpStatus.OK);
     }
 
     // GET Blocks
@@ -46,7 +54,12 @@ public class NodeController {
     @GetMapping("/blocks/{id}")
     public ResponseEntity<BlockViewModel> byId(@PathVariable int id) throws Exception {
         // TODO - 404 ?
-        BlockViewModel model = nodeService.getBlock(id);
-        return new ResponseEntity<BlockViewModel>(model, HttpStatus.OK); // or 404
+        return new ResponseEntity<>(nodeService.getBlock(id), HttpStatus.OK); // or 404
+    }
+
+    // GET Pending Transactions
+    @GetMapping("/transactions/pending")
+    public ResponseEntity<List<TransactionViewModel>> pending() {
+        return new ResponseEntity<>(nodeService.getPendingTransactions(), HttpStatus.OK);
     }
 }
