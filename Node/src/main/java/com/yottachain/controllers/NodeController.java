@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.yottachain.models.viewModels.*;
 import com.yottachain.services.implementations.NodeServiceImpl;
 import com.yottachain.services.interfaces.NodeService;
+import com.yottachain.utils.Helpers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +23,7 @@ public class NodeController {
 
     @RequestMapping("/")
     public String index() {
-        String html = "<h1>YottaChain - Simple Blockchain Network</h1><ul><li>GET <a href=\"/\">/</a></li><li>GET <a href=\"/info\">/info</a></li><li>GET <a href=\"/debug\">/debug</a></li><li>GET <a href=\"/debug/reset-chain\">/debug/reset-chain</a></li><li>GET <a href=\"/debug/mine/:minerAddress/:difficulty\">/debug/mine/:minerAddress/:difficulty</a></li><li>GET <a href=\"/blocks\">/blocks</a></li><li>GET <a href=\"/blocks/:index\">/blocks/:index</a></li><li>GET <a href=\"/transactions/pending\">/transactions/pending</a></li><li>GET <a href=\"/transactions/confirmed\">/transactions/confirmed</a></li><li>GET <a href=\"/transactions/:tranHash\">/transactions/:tranHash</a></li><li>GET <a href=\"/balances\">/balances</a></li><li>GET <a href=\"/address/:address/transactions\">/address/:address/transactions</a></li><li>GET <a href=\"/address/:address/balance\">/address/:address/balance</a></li><li>POST <a href=\"/transactions/send\">/transactions/send</a></li><li>GET <a href=\"/peers\">/peers</a></li><li>POST <a href=\"/peers/connect\">/peers/connect</a></li><li>POST <a href=\"/peers/notify-new-block\">/peers/notify-new-block</a></li><li>GET <a href=\"/mining/get-mining-job/:address\">/mining/get-mining-job/:address</a></li><li>POST <a href=\"/mining/submit-mined-block\">/mining/submit-mined-block</a></li></ul>";
-        return html; // TODO - list all requests for more user friendly API :))
+        return Helpers.html; // TODO - list all requests for more user friendly API :))
     }
 
     // GET Reset Chain
