@@ -16,6 +16,7 @@ public interface NodeService {
     List<TransactionViewModel> getTransactions(boolean isConfirmed);
     TransactionViewModel getTransactionByHash(String transactionHash);
     List<BalanceViewModel> getBalances();
+    BalanceForAddressViewModel getBalanceForAddress(String address);
     List<TransactionViewModel> getTransactionsByAddress(String address);
     TransactionCreatedViewModel addTransaction(TransactionBindingModel model) throws Exception;
 }

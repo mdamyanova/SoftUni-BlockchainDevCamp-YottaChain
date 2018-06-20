@@ -1,6 +1,6 @@
 package com.yottachain.controllers;
 
-import com.fasterxml.jackson.core.JsonParser;
+import com.yottachain.models.bindingModels.TransactionBindingModel;
 import com.yottachain.models.viewModels.*;
 import com.yottachain.services.implementations.NodeServiceImpl;
 import com.yottachain.services.interfaces.NodeService;
@@ -8,6 +8,7 @@ import com.yottachain.utils.Helpers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sun.misc.Request;
 
 import java.util.List;
 
@@ -18,7 +19,6 @@ public class NodeController {
 
     public NodeController() {
         this.nodeService = new NodeServiceImpl();
-        int difficulty = 5;
     }
 
     @RequestMapping("/")
@@ -84,9 +84,9 @@ public class NodeController {
 
     // TODO
     // POST Create a Transaction
-    @GetMapping("/transactions/send")
-    public ResponseEntity<TransactionCreatedViewModel> sendTransaction() {
-        return null; // TODO
+    @PostMapping("/transactions/send")
+    public ResponseEntity<TransactionCreatedViewModel> sendTransaction(@RequestBody TransactionBindingModel transaction) throws Exception {
+        return new ResponseEntity<>(nodeService.addTransaction(transaction), HttpStatus.CREATED);
     }
 
     @ExceptionHandler(Exception.class)

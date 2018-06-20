@@ -1,6 +1,7 @@
 package com.yottachain.models.viewModels;
 
 public class TransactionCreatedViewModel {
+
     private String createdOn;
     private String transactionHash;
 

@@ -14,7 +14,10 @@ import org.modelmapper.TypeToken;
 
 import java.lang.reflect.Type;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class NodeServiceImpl implements NodeService {
@@ -84,13 +87,16 @@ public class NodeServiceImpl implements NodeService {
 
         Block genesis = new Block();
         List<Transaction> transactions = new ArrayList<>();
-        Address minedBy = new Address("00");
+        Address address = new Address();
+        address.setAddressId("00");
+
         genesis.setIndex(0);
         genesis.setTransactions(transactions);
-        genesis.setDifficulty(1);
+        genesis.setDifficulty(0);
         genesis.setPreviousBlockHash("NONE");
-        genesis.setMinedBy(minedBy);
+        genesis.setMinedBy(address);
         genesis.setBlockDataHash(Hex.toHexString("TODO".getBytes()));
+        genesis.setNonce(0);
         genesis.setCreatedOn(0L);
         genesis.setBlockDataHash(Hex.toHexString("TODO".getBytes()));
         return genesis;
@@ -129,6 +135,13 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
+    public BalanceForAddressViewModel getBalanceForAddress(String address) {
+        // for address with no transactions -> return zeros
+        // for invalid address -> 404 Invalid address
+        return null; // TODO
+    }
+
+    @Override
     public List<TransactionViewModel> getTransactionsByAddress(String address) {
         List<TransactionViewModel> model = new ArrayList<>();
         return null; //TODO
@@ -140,10 +153,10 @@ public class NodeServiceImpl implements NodeService {
 
         // TODO add address to addresses !!! - hashmap?
 
-        boolean isValid = transactionService.validate(transaction);
+        String isValidMessage = transactionService.validate(transaction);
 
-        if (!isValid) {
-            throw new Exception("Invalid transaction"); // TODO - Custom exception
+        if (!isValidMessage.equals("Valid transaction")) {
+            throw new Exception(isValidMessage); // TODO - Custom exception
         }
 
         if (confirmedTransactionsById.containsKey(transaction.getTransactionHash())) {

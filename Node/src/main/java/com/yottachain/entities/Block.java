@@ -1,8 +1,5 @@
 package com.yottachain.entities;
 
-import org.bouncycastle.util.encoders.Hex;
-
-import java.security.MessageDigest;
 import java.util.*;
 
 public class Block {
@@ -13,6 +10,7 @@ public class Block {
     private String previousBlockHash;
     private Address minedBy;
     private String blockDataHash;
+    private long nonce;
     private long createdOn;
     private String blockHash;
 
@@ -67,6 +65,10 @@ public class Block {
     public void setBlockDataHash(String blockDataHash) {
         this.blockDataHash = blockDataHash;
     }
+
+    public long getNonce() { return this.nonce; }
+
+    public void setNonce(long nonce) { this.nonce = nonce; }
 
     public long getCreatedOn() {
         return this.createdOn;

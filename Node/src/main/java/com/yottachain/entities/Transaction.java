@@ -15,7 +15,6 @@ public class Transaction {
     private String transactionHash;
     private int minedInBlockIndex;
     private boolean isConfirmed;
-    private long nonce;
 
     public Address getFrom() {
         return this.from;
@@ -103,13 +102,5 @@ public class Transaction {
 
     public void setMinedInBlockIndex(int minedInBlockIndex) {
         this.minedInBlockIndex = minedInBlockIndex;
-    }
-
-    public long getNonce() {
-        return nonce;
-    }
-
-    public void setNonce(long nonce) {
-        this.nonce = nonce;
     }
 }

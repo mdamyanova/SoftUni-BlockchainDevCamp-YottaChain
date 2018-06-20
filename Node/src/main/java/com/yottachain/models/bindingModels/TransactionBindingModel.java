@@ -6,27 +6,27 @@ import java.util.List;
 
 public class TransactionBindingModel {
 
-    private Address from;
-    private Address to;
+    private String from;
+    private String to;
     private long amount;
     private int fee;
     private String senderPublicKey;
     private List<String> senderSignature;
     private long nonce;
 
-    public Address getFrom() {
+    public String getFrom() {
         return this.from;
     }
 
-    public void setFrom(Address from) {
+    public void setFrom(String from) {
         this.from = from;
     }
 
-    public Address getTo() {
+    public String getTo() {
         return this.to;
     }
 
-    public void setTo(Address to) {
+    public void setTo(String to) {
         this.to = to;
     }
 

@@ -1,19 +1,25 @@
 package com.yottachain.services.implementations;
 
+import com.yottachain.entities.Address;
 import com.yottachain.entities.Transaction;
 import com.yottachain.models.bindingModels.TransactionBindingModel;
-import com.yottachain.models.viewModels.TransactionViewModel;
 import com.yottachain.services.interfaces.TransactionService;
+import com.yottachain.utils.CryptoUtils;
+import com.yottachain.utils.ValidationUtils;
 
 public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction create(TransactionBindingModel model) {
+        Address from = new Address();
+        from.setAddressId(model.getFrom());
+        Address to = new Address();
+        to.setAddressId(model.getTo());
+
         Transaction transaction = new Transaction();
-        transaction.setFrom(model.getFrom());
-        transaction.setTo(model.getTo());
+        transaction.setFrom(from);
+        transaction.setTo(to);
         transaction.setAmount(model.getAmount());
-        transaction.setNonce(model.getNonce());
         transaction.setSenderPublicKey(model.getSenderPublicKey());
         transaction.setSenderSignature(model.getSenderSignature());
         return transaction;
@@ -26,8 +32,24 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public boolean validate(Transaction transaction) {
-        // TODO - Get transaction data, hash, validate signature
-        return false;
+    public String validate(Transaction transaction) {
+        String fromAddress = transaction.getFrom().getAddressId();
+        if (!ValidationUtils.isValidAddress(fromAddress)) {
+            return "Invalid sender address: " + fromAddress;
+        }
+        String toAddress = transaction.getTo().getAddressId();
+        if (!ValidationUtils.isValidAddress(toAddress)) {
+            return "Invalid recipient address: " + toAddress;
+        }
+        String publicKey = transaction.getSenderPublicKey();
+        if (!ValidationUtils.isValidPublicKey(publicKey)) {
+            return "Invalid public key: " + publicKey;
+        }
+        String senderAddress = CryptoUtils.publicKeyToAddress(publicKey);
+        if (!senderAddress.equals(fromAddress)) {
+            return "The public key should match the sender address";
+        }
+
+        return "Valid transaction";
     }
 }
