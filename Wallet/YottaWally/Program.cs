@@ -21,6 +21,7 @@ namespace YottaWally
         private static RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider(); ///Crypto Service Provider
         private static Secp256K1Manager secp256 = new Secp256K1Manager(); ///Secp256k1 Manager
         private static readonly HttpClient client = new HttpClient(); ///Http Client
+        static WalletData walletData = new WalletData(); /// Wallet Data
 
         static string openedWalletName = string.Empty; //The Name of the Wallet you have Opened
         static int startCounter = 0; //Shows how many times was the Main Method Called
@@ -139,7 +140,9 @@ namespace YottaWally
                             var historyTask = GetTransactionHistory();
                             historyTask.Wait(); //Waits for the task to Complete
                             break;
-                        case "send": 
+                        case "send":
+                            var sendTask = Send();
+                            sendTask.Wait(); //Waits for the task to Complete
                             break;
                     }
                 }
@@ -321,7 +324,6 @@ namespace YottaWally
         {
             try
             {
-                WalletData walletData = new WalletData();
                 Write(">>> Place .json file in \"Wallets/\" with the name of the Wallet on it!");
                 ReadKey();
                 WriteLine();
@@ -470,7 +472,7 @@ namespace YottaWally
             if (!Directory.Exists($@"Wallets/{walletName}"))
             {
                 Directory.CreateDirectory($@"Wallets/{walletName}");
-                WalletData walletData = new WalletData(walletName, password, privateKeys, publicKeys, pubKeysCompressed, addresses);
+                walletData = new WalletData(walletName, password, privateKeys, publicKeys, pubKeysCompressed, addresses);
                 string json = JsonConvert.SerializeObject(walletData, Formatting.Indented);
                 File.WriteAllText($@"Wallets/{walletName}/walletData.json", json);
                 CreateSample($@"Wallets/{walletName}.zip", password, $@"Wallets/{walletName}");
@@ -504,7 +506,7 @@ namespace YottaWally
         {
             try
             {
-                string responseString = await client.GetStringAsync("localhost:8080/balances");
+                string responseString = await client.GetStringAsync("https://stormy-everglades-34766.herokuapp.com/balances");
                 ConcurrentDictionary<string, decimal> addressBalances = JsonConvert.DeserializeObject<ConcurrentDictionary<string, decimal>>(responseString);
                 GetBalances(new Balances(addressBalances));
             }
@@ -541,8 +543,9 @@ namespace YottaWally
             string address = ReadLine();
             try
             {
+                //string responseString = await client.GetStringAsync($"localhost:8080/address/{address}/transactions");
                 string responseString = await client.GetStringAsync($"localhost:8080/address/{address}/transactions");
-                List<Transaction> transactionHistory = JsonConvert.DeserializeObject<List<Transaction>>(responseString);
+                List<GetTransaction> transactionHistory = JsonConvert.DeserializeObject<List<GetTransaction>>(responseString);
                 if (transactionHistory.Count > 0) {
                     foreach (var transaction in transactionHistory)
                     {
@@ -573,6 +576,31 @@ namespace YottaWally
             {
                 Print("ERROR! COULD NOT GET HISTORY OF TRANSACTIONS!");
             }
+        }
+
+        static async Task Send()
+        { 
+            //CRITICAL BUG WITH SEND METHOD
+            //TODO: IMPLEMENT A METHOD THAT GETS EVERYTHING 
+            Print("From: ");
+            for (int i = 0; i < 5; i++)
+            {
+                Print($"[{i+1}] {walletData.Addresses[i]}");
+            }
+
+            int checker = int.Parse(ReadLine())-1; //Gets which Address is going to be used
+            string fromAddress = walletData.Addresses[checker];
+            string senderPubKey = walletData.PubKeysCompressed[checker];
+            Write(">>> To: ");
+            string toAddress = ReadLine();
+            Write(">>> Value: ");
+            decimal value = decimal.Parse(ReadLine());
+            Write(">>> Fee: ");
+            int fee = int.Parse(ReadLine());
+            Write(">>> Data: ");
+            string data = ReadLine();
+            int recoveryID = new int();
+            Secp256K1Manager.SignCompact(Encoding.UTF8.GetBytes(data), Encoding.UTF8.GetBytes(walletData.PrivateKeys[checker]),out recoveryID);
         }
 
         static byte[] StringToByteArray(string hex) ///Gets HEX string and returns it as a Byte Array
@@ -669,7 +697,6 @@ namespace YottaWally
             try
             {
                 List<string> addresses = new List<string>(); //List with all addresses in the Wallet
-                WalletData walletData = new WalletData();
 
                 if (!File.Exists($@"Wallets/{openedWalletName}.json"))
                 {
