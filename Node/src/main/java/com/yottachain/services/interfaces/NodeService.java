@@ -14,9 +14,9 @@ public interface NodeService {
     BlockViewModel getBlock(int blockIndex) throws Exception;
     Block generateGenesisBlock();
     List<TransactionViewModel> getTransactions(boolean isConfirmed);
-    TransactionViewModel getTransactionByHash(String transactionHash);
+    TransactionViewModel getTransactionByHash(String transactionHash) throws Exception;
     List<BalanceViewModel> getBalances();
     BalanceForAddressViewModel getBalanceForAddress(String address);
-    List<TransactionViewModel> getTransactionsByAddress(String address);
+    List<TransactionViewModel> getTransactionsByAddress(String address) throws Exception;
     TransactionCreatedViewModel addTransaction(TransactionBindingModel model) throws Exception;
 }

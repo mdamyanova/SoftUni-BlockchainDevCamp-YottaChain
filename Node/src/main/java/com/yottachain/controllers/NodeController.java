@@ -8,7 +8,6 @@ import com.yottachain.utils.Helpers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sun.misc.Request;
 
 import java.util.List;
 
@@ -23,70 +22,68 @@ public class NodeController {
 
     @RequestMapping("/")
     public String index() {
-        return Helpers.html; // TODO - list all requests for more user friendly API :))
+        return Helpers.html;
     }
 
-    // GET Reset Chain
     @GetMapping("/debug/reset-chain")
     public ResponseEntity<ResetChainViewModel> reset() {
-        return new ResponseEntity<>(nodeService.resetChain(), HttpStatus.OK);
+        return new ResponseEntity<>(this.nodeService.resetChain(), HttpStatus.OK);
     }
 
-    // GET Info
     @GetMapping("/info")
     public ResponseEntity<NodeInfoViewModel> info() {
-        return new ResponseEntity<>(nodeService.getInfo(), HttpStatus.OK);
+        return new ResponseEntity<>(this.nodeService.getInfo(), HttpStatus.OK);
     }
 
-    // GET Blocks
     @GetMapping("/blocks")
     public ResponseEntity<List<BlockViewModel>> blocks() {
-        return new ResponseEntity<>(nodeService.getAllBlocks(), HttpStatus.OK);
+        return new ResponseEntity<>(this.nodeService.getAllBlocks(), HttpStatus.OK);
     }
 
-    // GET Block by Id
     @GetMapping("/blocks/{id}")
-    public ResponseEntity<BlockViewModel> blockById(@PathVariable int id) throws Exception {
-        return new ResponseEntity<>(nodeService.getBlock(id), HttpStatus.OK); // or 404
+    public ResponseEntity<BlockViewModel> blockById(
+            @PathVariable int id) throws Exception {
+        return new ResponseEntity<>(this.nodeService.getBlock(id), HttpStatus.OK);
     }
 
-    // GET Pending Transactions
     @GetMapping("/transactions/pending")
     public ResponseEntity<List<TransactionViewModel>> pending() {
-        return new ResponseEntity<>(nodeService.getTransactions(false), HttpStatus.OK);
+        return new ResponseEntity<>(this.nodeService.getTransactions(false),
+                HttpStatus.OK);
     }
 
-    // GET Confirmed Transactions
     @GetMapping("/transactions/confirmed")
     public ResponseEntity<List<TransactionViewModel>> confirmed() {
-        return new ResponseEntity<>(nodeService.getTransactions(true), HttpStatus.OK);
+        return new ResponseEntity<>(this.nodeService.getTransactions(true),
+                HttpStatus.OK);
     }
 
-    // GET Transaction by Hash
     @GetMapping("/transactions/{hash}")
-    public ResponseEntity<TransactionViewModel> transactionByHash(@PathVariable String hash) {
-        return new ResponseEntity<>(nodeService.getTransactionByHash(hash), HttpStatus.OK); // or 404
+    public ResponseEntity<TransactionViewModel> transactionByHash(
+            @PathVariable String hash) throws Exception {
+        return new ResponseEntity<>(this.nodeService.getTransactionByHash(hash),
+                HttpStatus.OK);
     }
 
-    // GET All Account Balances
     @GetMapping("/balances")
     public ResponseEntity<List<BalanceViewModel>> balances() {
-        return new ResponseEntity<>(nodeService.getBalances(), HttpStatus.OK);
+        return new ResponseEntity<>(this.nodeService.getBalances(), HttpStatus.OK);
     }
 
-    // GET Transactions for Address
     @GetMapping("/address/{address}/transactions")
-    public ResponseEntity<List<TransactionViewModel>> transactionsByAddress(@PathVariable String address) {
-        return new ResponseEntity<>(nodeService.getTransactionsByAddress(address), HttpStatus.OK); // or 404
+    public ResponseEntity<List<TransactionViewModel>> transactionsByAddress(
+            @PathVariable String address) throws Exception {
+        return new ResponseEntity<>(this.nodeService.getTransactionsByAddress(address),
+                HttpStatus.OK);
     }
 
     // TODO - Get Balances for Address
 
-    // TODO
-    // POST Create a Transaction
     @PostMapping("/transactions/send")
-    public ResponseEntity<TransactionCreatedViewModel> sendTransaction(@RequestBody TransactionBindingModel transaction) throws Exception {
-        return new ResponseEntity<>(nodeService.addTransaction(transaction), HttpStatus.CREATED);
+    public ResponseEntity<TransactionCreatedViewModel> sendTransaction(
+            @RequestBody TransactionBindingModel transaction) throws Exception {
+        return new ResponseEntity<>(this.nodeService.addTransaction(transaction),
+                HttpStatus.CREATED);
     }
 
     @ExceptionHandler(Exception.class)

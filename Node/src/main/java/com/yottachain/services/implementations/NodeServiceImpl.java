@@ -26,7 +26,7 @@ public class NodeServiceImpl implements NodeService {
     private TransactionService transactionService;
     private ConcurrentHashMap<String, Transaction> pendingTransactionsById;
     private ConcurrentHashMap<String, Transaction> confirmedTransactionsById;
-    private List<Address> addresses; // TODO
+    private ConcurrentHashMap<String, Address> addresses; // Address Id -> AddressId and Amount
     private final List<Block> blockchain;
 
     public NodeServiceImpl() {
@@ -34,14 +34,13 @@ public class NodeServiceImpl implements NodeService {
         this.transactionService = new TransactionServiceImpl();
         this.pendingTransactionsById = new ConcurrentHashMap<>();
         this.confirmedTransactionsById = new ConcurrentHashMap<>();
-        this.addresses = new ArrayList<>();
+        this.addresses = new ConcurrentHashMap<>();
         this.blockchain = new ArrayList<>();
         this.blockchain.add(generateGenesisBlock());
     }
 
     @Override
     public NodeInfoViewModel getInfo() {
-        // TODO
         NodeInfoViewModel model = new NodeInfoViewModel();
         model.setNodeId(0);
         model.setHost("localhost");
@@ -65,26 +64,25 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public List<BlockViewModel> getAllBlocks() {
         Type targetListType = new TypeToken<List<BlockViewModel>>() {}.getType();
-        return blockchain.size() > 0 ?
-                mapper.map(blockchain, targetListType) : Collections.emptyList();
+        return this.blockchain.size() > 0 ?
+                this.mapper.map(this.blockchain, targetListType) : Collections.emptyList();
     }
 
     @Override
     public BlockViewModel getBlock(int blockIndex) throws Exception {
-        if (blockIndex < 0 || blockIndex > blockchain.size()) {
-            throw new Exception("No such block"); // TODO - Make custom exception for Block not found
+        if (blockIndex < 0 || blockIndex > this.blockchain.size()) {
+            throw new Exception("No such block");
         }
-        Block block = blockchain.stream().filter(x -> x.getIndex() == blockIndex).findFirst().orElse(null);
+        Block block = this.blockchain.stream().filter(x -> x.getIndex() == blockIndex)
+                .findFirst().orElse(null);
         if (block == null) {
-          throw new Exception("");
+          throw new Exception("Some");
         }
-        return mapper.map(block, BlockViewModel.class);
+        return this. mapper.map(block, BlockViewModel.class);
     }
 
     @Override
     public Block generateGenesisBlock() {
-       // if (blockchain.size() != 0) - careful here, TODO
-
         Block genesis = new Block();
         List<Transaction> transactions = new ArrayList<>();
         Address address = new Address();
@@ -105,33 +103,34 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public List<TransactionViewModel> getTransactions(boolean isConfirmed) {
         List<TransactionViewModel> model = new ArrayList<>();
-        for (Map.Entry<String, Transaction> transaction : pendingTransactionsById.entrySet()) {
+        for (Map.Entry<String, Transaction> transaction : this.pendingTransactionsById.entrySet()) {
             if (isConfirmed == transaction.getValue().isConfirmed()) {
-                model.add(mapper.map(transaction.getValue(), TransactionViewModel.class));
+                model.add(this.mapper.map(transaction.getValue(), TransactionViewModel.class));
             }
         }
         return model;
     }
 
     @Override
-    public TransactionViewModel getTransactionByHash(String transactionHash) {
-        // TODO - this get() ?
-        Transaction transaction = pendingTransactionsById.entrySet().stream()
-                .filter(x -> x.getValue().getTransactionHash().equals(transactionHash))
-                .findFirst().get().getValue();
-
+    public TransactionViewModel getTransactionByHash(String transactionHash) throws Exception {
+        Transaction transaction = this.pendingTransactionsById.values().stream()
+                .filter(x -> x.getTransactionHash().equals(transactionHash))
+                .findFirst().orElse(null);
         if (transaction == null) {
-            transaction = confirmedTransactionsById.entrySet().stream()
-                    .filter(x -> x.getValue().getTransactionHash().equals(transactionHash))
-                    .findFirst().get().getValue();
+            transaction = this.confirmedTransactionsById.values().stream()
+                    .filter(x -> x.getTransactionHash().equals(transactionHash))
+                    .findFirst().orElse(null);
         }
-        return mapper.map(transaction, TransactionViewModel.class);
+        if (transaction == null) {
+            throw new Exception("Invalid hash");
+        }
+        return this.mapper.map(transaction, TransactionViewModel.class);
     }
 
     @Override
     public List<BalanceViewModel> getBalances() {
         Type targetListType = new TypeToken<List<BalanceViewModel>>() {}.getType();
-        return mapper.map(addresses, targetListType);
+        return this.mapper.map(this.addresses.values(), targetListType);
     }
 
     @Override
@@ -142,31 +141,43 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public List<TransactionViewModel> getTransactionsByAddress(String address) {
+    public List<TransactionViewModel> getTransactionsByAddress(String address) throws Exception {
         List<TransactionViewModel> model = new ArrayList<>();
-        return null; //TODO
+        if (!this.addresses.containsKey(address)) {
+            throw new Exception("Address not found");
+        }
+        for (Map.Entry<String, Transaction> entry : this.confirmedTransactionsById.entrySet()) {
+            if (entry.getValue().getFrom().getAddressId().equals(address) ||
+                    entry.getValue().getTo().getAddressId().equals(address)) {
+                model.add(this.mapper.map(entry.getValue(), TransactionViewModel.class));
+            }
+        }
+        for (Map.Entry<String, Transaction> entry : this.pendingTransactionsById.entrySet()) {
+            if (entry.getValue().getFrom().getAddressId().equals(address) ||
+                    entry.getValue().getTo().getAddressId().equals(address)) {
+                model.add(this.mapper.map(entry.getValue(), TransactionViewModel.class));
+            }
+        }
+        return model;
     }
 
     @Override
     public TransactionCreatedViewModel addTransaction(TransactionBindingModel model) throws Exception {
-        Transaction transaction = transactionService.create(model);
+        Transaction transaction = this.transactionService.create(model);
 
         // TODO add address to addresses !!! - hashmap?
 
-        String isValidMessage = transactionService.validate(transaction);
+        String isValidMessage = this.transactionService.validate(transaction);
 
         if (!isValidMessage.equals("Valid transaction")) {
-            throw new Exception(isValidMessage); // TODO - Custom exception
+            throw new Exception(isValidMessage);
         }
-
-        if (confirmedTransactionsById.containsKey(transaction.getTransactionHash())) {
-            throw new Exception("Transaction is already confirmed"); // TODO - Custom exception
+        if (this.confirmedTransactionsById.containsKey(transaction.getTransactionHash())) {
+            throw new Exception("Transaction is already confirmed");
         }
-
-        if (!pendingTransactionsById.containsKey(transaction.getTransactionHash())) {
-            pendingTransactionsById.put(transaction.getTransactionHash(), transaction);
+        if (!this.pendingTransactionsById.containsKey(transaction.getTransactionHash())) {
+            this.pendingTransactionsById.put(transaction.getTransactionHash(), transaction);
         }
-
         TransactionCreatedViewModel createdTrModel = new TransactionCreatedViewModel();
         createdTrModel.setCreatedOn(Helpers.toISO8601UTC(ZonedDateTime.now()));
         createdTrModel.setTransactionHash(transaction.getTransactionHash());

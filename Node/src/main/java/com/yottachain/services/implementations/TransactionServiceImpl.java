@@ -6,6 +6,9 @@ import com.yottachain.models.bindingModels.TransactionBindingModel;
 import com.yottachain.services.interfaces.TransactionService;
 import com.yottachain.utils.CryptoUtils;
 import com.yottachain.utils.ValidationUtils;
+import org.bouncycastle.math.ec.ECPoint;
+
+import java.math.BigInteger;
 
 public class TransactionServiceImpl implements TransactionService {
 
@@ -47,9 +50,14 @@ public class TransactionServiceImpl implements TransactionService {
         }
         String senderAddress = CryptoUtils.publicKeyToAddress(publicKey);
         if (!senderAddress.equals(fromAddress)) {
-            return "The public key should match the sender address";
+            return "The public key should match the sender address: " + senderAddress;
         }
-
         return "Valid transaction";
+    }
+
+    private static String encodeECPointHexCompressed(ECPoint point) {
+        BigInteger x = point.getXCoord().toBigInteger();
+        BigInteger y = point.getYCoord().toBigInteger();
+        return x.toString(16) + (y.testBit(0) ? 1 : 0);
     }
 }

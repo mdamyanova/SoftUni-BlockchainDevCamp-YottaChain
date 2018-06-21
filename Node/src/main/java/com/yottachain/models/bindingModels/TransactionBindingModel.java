@@ -1,7 +1,5 @@
 package com.yottachain.models.bindingModels;
 
-import com.yottachain.entities.Address;
-
 import java.util.List;
 
 public class TransactionBindingModel {
@@ -10,6 +8,7 @@ public class TransactionBindingModel {
     private String to;
     private long amount;
     private int fee;
+    private String transactionData;
     private String senderPublicKey;
     private List<String> senderSignature;
     private long nonce;
@@ -45,6 +44,10 @@ public class TransactionBindingModel {
     public void setFee(int fee) {
         this.fee = fee;
     }
+
+    public String getTransactionData() { return this.transactionData; }
+
+    public void setTransactionData(String transactionData) { this.transactionData = transactionData; }
 
     public String getSenderPublicKey() {
         return this.senderPublicKey;

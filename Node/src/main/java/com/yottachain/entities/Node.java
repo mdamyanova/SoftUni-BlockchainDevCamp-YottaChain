@@ -7,14 +7,12 @@ import java.util.List;
 public class Node {
 
     private int nodeId;
-    private String host;
-    private int port;
-    private String url;
-    private List<Peer> peers;
-    private List<Block> chain;
-    private int chainId;
-
-    // TODO - constructor
+    private String host; // IP address
+    private int port; // TCP port
+    private String url; // Base URL for the REST endpoints
+    private List<Peer> peers; // Peers connected to this node
+    private List<Block> chain; // The Blockchain
+    private int chainId; // Hash of the genesis block
 
     public int getNodeId() {
         return this.nodeId;
