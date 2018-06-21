@@ -19,6 +19,7 @@ com\yottachain\models\viewModels\BlockViewModel.class
 com\yottachain\services\implementations\NodeServiceImpl$1.class
 com\yottachain\entities\Address.class
 com\yottachain\models\viewModels\NodeInfoViewModel.class
+com\yottachain\entities\Example.class
 com\yottachain\config\WebSocketConfig.class
 com\yottachain\entities\Node.class
 com\yottachain\controllers\NodeController.class
