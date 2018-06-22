@@ -17,7 +17,7 @@ namespace YottaWally
             PublicKeys = PubKeys;
             this.PubKeysCompressed = PubKeysCompressed;
             this.Addresses = Addresses;
-            CreationTime = $"{DateTime.Now.Year}/{DateTime.Now.Month}/{DateTime.Now.Day} {DateTime.Now.Hour.ToString("00")}:{DateTime.Now.Minute.ToString("00")}";
+            CreationTime = $"{DateTime.UtcNow.Year}/{DateTime.UtcNow.Month}/{DateTime.UtcNow.Day} {DateTime.UtcNow.Hour.ToString("00")}:{DateTime.UtcNow.Minute.ToString("00")}";
         }
 
         public string Name { get; set; }
