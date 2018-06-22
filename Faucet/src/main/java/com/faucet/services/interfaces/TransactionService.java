@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface TransactionService {
 
+    public void sendTransaction(String recipientPrivateKey);
 }
