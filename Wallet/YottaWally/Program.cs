@@ -742,18 +742,6 @@ namespace YottaWally
             return x.ToString(16) + Convert.ToInt32(y.TestBit(0));
         }
 
-        static string[] GetSignature(int i,string message) ///Signs The Transaction data using the Wallet Private Key
-        {
-            SHA256 SHA256Hash = SHA256Managed.Create();
-            var privKey = new EthECKey(walletData.PrivateKeys[i]);
-            byte[] msgBytes = Encoding.UTF8.GetBytes(message);
-            byte[] msgHash = SHA256Hash.ComputeHash(msgBytes);
-            var signature = privKey.Sign(msgHash);
-            string[] senderSignature = new string[]
-            { signature.R.ToHex(), signature.S.ToHex() };
-            return senderSignature;
-        }
-
         static byte[] StringToByteArray(string hex) ///Gets HEX string and returns it as a Byte Array
         {
             return Enumerable.Range(0, hex.Length)
