@@ -162,6 +162,9 @@ namespace YottaWally
         static void Initialize() ///Initialization of the program
         {
             Title = "YottaWally v.1";
+            BackgroundColor = ConsoleColor.White;
+            Clear();
+            ForegroundColor = ConsoleColor.Black;
         }
 
         static void About(string[] availableOperations) ///Describes what the app does
