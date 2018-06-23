@@ -14,7 +14,7 @@ YottaChain is a **fully-functional blockchain** network consisting of **Nodes**,
 ### **Mining** software
 - Contributor: **Velik Lazarov - [VelikHimik](https://github.com/VelikHimik)**
 - Functionality: **proof-of-work**
-- Technologies: //TODO
+- Technologies: Java
 
 ### **Wallet** software
 - Contributor: **Emil Yordanov - [zyppyvids](https://github.com/zyppyvids)**
@@ -22,13 +22,13 @@ YottaChain is a **fully-functional blockchain** network consisting of **Nodes**,
 - Technologies: C#, BouncyCastle, Nethereum, Microsoft.Http.Net
 
 ### **Faucet** app
-- Contributor: //TODO
+- Contributor: **Vasil Panovski - [VasilPanovski](https://github.com/VasilPanovski)**
 - Functionality: **request free coins**
-- Technologies: //TODO
+- Technologies: Java, Spring MVC, BouncyCastle
 
 ### **Block Explorer** app
-- Contributor: //TODO
+- Contributor: **Emil Yordanov - [zyppyvids](https://github.com/zyppyvids)**
 - Functionality: **browse blocks and transactions**
-- Technologies: //TODO
+- Technologies: C#, Microsoft.Http.Net
 
 ![Blockchain Scheme](https://imgur.com/zOkdZ1T.jpg)
