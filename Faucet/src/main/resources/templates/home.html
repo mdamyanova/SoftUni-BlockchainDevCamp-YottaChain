@@ -11,36 +11,44 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
     <div class="container">
         <a class="navbar-brand" href="/">Yotta Chain - Faucet</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/donate">Donate?</a>
-                </li>
-            </ul>
-        </div>
+        <!--<div class="collapse navbar-collapse" id="navbarResponsive">-->
+            <!--<ul class="navbar-nav ml-auto">-->
+                <!--<li class="nav-item">-->
+                    <!--<a class="nav-link" href="/donate">Donate?</a>-->
+                <!--</li>-->
+            <!--</ul>-->
+        <!--</div>-->
     </div>
 </nav>
 <main>
     <div class="container">
-        <form method="POST" href="/new-transaction">
+        <form method="POST" action="/new-transaction">
             <div class="form-group row">
                 <label for="privateKey" class="col-sm-2 col-form-label">Private Key</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="privateKey" placeholder="Private Key">
+                    <input type="text" class="form-control" name="privateKey" id="privateKey" placeholder="Private Key">
                 </div>
             </div>
             <div class="form-group row">
-                <div class="g-recaptcha" data-sitekey="6LcR_F8UAAAAAHdHu3Cqylk4MXvHaSSBwN1_52fU"></div>
+                <div class="col-sm-2 col-form-label"></div>
+                <div class="col-sm-10">
+                    <div class="g-recaptcha" data-sitekey="6LcR_F8UAAAAAHdHu3Cqylk4MXvHaSSBwN1_52fU"></div>
+                </div>
             </div>
+            <div>
+                <div class="col-sm-2 col-form-label"></div>
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+
+
         </form>
     </div>
 </main>
 
 <footer>
-    <p class="copyright text-muted small">Copyright &copy; Your Company 2017. All Rights Reserved</p>
+    <p class="copyright text-muted small">Copyright &copy; Yotta Faucet 2018. All Rights Reserved</p>
 </footer>
 <script src="/vendor/jquery/jquery.min.js"></script>
 <script src="/vendor/bootstrap/js/bootstrap.min.js"></script>

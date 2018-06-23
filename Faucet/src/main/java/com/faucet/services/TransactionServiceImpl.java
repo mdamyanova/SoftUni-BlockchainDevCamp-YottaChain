@@ -1,11 +1,16 @@
 package com.faucet.services;
 
 import com.faucet.entities.Transaction;
+import com.faucet.exceptions.TransactionRequestException;
+import com.faucet.models.viewModels.TransactionViewModel;
 import com.faucet.repositories.TransactionDao;
 import com.faucet.services.interfaces.TransactionService;
 import com.faucet.utils.Config;
 import com.faucet.utils.CryptoUtil;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -13,9 +18,12 @@ import java.util.Date;
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
-    public void sendTransaction(String recipientPrivateKey) {
+    public TransactionViewModel sendTransaction(String recipientPrivateKey) {
+        Transaction transaction = null;
         try {
             String recipientAddress = CryptoUtil.getRecipientAddressFromPrivateKey(recipientPrivateKey);
 
@@ -23,13 +31,13 @@ public class TransactionServiceImpl implements TransactionService {
             Date date = new Date();
 
             // Do nothing is request is less the 10 minutes
-            if (lastRequest == null || lastRequest.getLastRequest().getTime() - date.getTime() < Config.MAX_REQUEST_TIME) {
-                return;
+            if (lastRequest != null && lastRequest.getLastRequest().getTime() - date.getTime() < Config.MAX_REQUEST_TIME) {
+                throw new TransactionRequestException();
             }
 
             Timestamp ts = new Timestamp(date.getTime());
 
-            Transaction transaction = CryptoUtil.signAndVerifyTransaction(
+            transaction = CryptoUtil.signAndVerifyTransaction(
                     TransactionDao.getFaucetAddress(),
                     Config.VALUE,
                     Config.FEE,
@@ -40,6 +48,10 @@ public class TransactionServiceImpl implements TransactionService {
 
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+        } catch (TransactionRequestException e) {
+            e.printStackTrace();
         }
+
+        return modelMapper.map(transaction, TransactionViewModel.class);
     }
 }
