@@ -62,7 +62,7 @@ namespace YottaWally
             if (startCounter == 1) //Prevent Showing unnecessary things
             {
                 Initialize();
-                About(availableOperations);
+                About();
             }
 
             while (input.ToLower() != "exit")
@@ -130,10 +130,10 @@ namespace YottaWally
                     switch (input) //In-wallet Main Logic
                     {
                         case "balance":
-                            Write(">>> [\"Address\", \"Wallet\"]: ");
+                            Write(">>> [\"Address\", \"All\"]: ");
 
                             string cmd = ReadLine();
-                            if (cmd.ToLower() == "wallet")
+                            if (cmd.ToLower() == "all")
                             {
                                 var task = FillBalancesClass();
                                 task.Wait(); //Waits for the task to Complete
@@ -167,7 +167,7 @@ namespace YottaWally
             ForegroundColor = ConsoleColor.Black;
         }
 
-        static void About(string[] availableOperations) ///Describes what the app does
+        static void About() ///Describes what the app does
         {
             WriteLine("YOTTAWALLY v.1");
             WriteLine("Part of the YottaChain Blockchain Project");
@@ -516,18 +516,11 @@ namespace YottaWally
             return sb.ToString().ToLower();
         }
 
-        static async Task FillBalancesClass() ///Fills the Balances.cs Class with Information from the Node
+        static async Task FillBalancesClass() ///Gets the Balances
         {
-            try
-            {
-                string responseString = await client.GetStringAsync("http://localhost:8080/balances");
-                ConcurrentDictionary<string, decimal> addressBalances = JsonConvert.DeserializeObject<ConcurrentDictionary<string, decimal>>(responseString);
-                GetBalances(new Balances(addressBalances));
-            }
-            catch
-            {
-                Print("ERROR! COULD NOT GET BALANCES!");
-            }
+            string responseString = await client.GetStringAsync("http://localhost:8080/balances");
+            List<Balances> addressBalances = JsonConvert.DeserializeObject<List<Balances>>(responseString);
+            GetBalances(addressBalances);
         }
 
         static async Task GetBalanceByAddress() ///Gets the Balance from the Node By the Address 
@@ -724,18 +717,18 @@ namespace YottaWally
             return result;
         }
 
-        public static string BytesToHex(byte[] bytes) ///Gets a Byte Array and returns a HEX string
+        private static string BytesToHex(byte[] bytes) ///Gets a Byte Array and returns a HEX string
         {
             return string.Concat(bytes.Select(b => b.ToString("x2")));
         }
 
-        public static Org.BouncyCastle.Math.EC.ECPoint GetPublicKeyFromPrivateKey(BigInteger privKey) ///Recovers Public Key from Private Key
+        private static Org.BouncyCastle.Math.EC.ECPoint GetPublicKeyFromPrivateKey(BigInteger privKey) ///Recovers Public Key from Private Key
         {
             Org.BouncyCastle.Math.EC.ECPoint pubKey = curve.G.Multiply(privKey).Normalize();
             return pubKey;
         }
 
-        public static string EncodeECPointHexCompressed(Org.BouncyCastle.Math.EC.ECPoint point)
+        private static string EncodeECPointHexCompressed(Org.BouncyCastle.Math.EC.ECPoint point)
         {
             BigInteger x = point.XCoord.ToBigInteger();
             BigInteger y = point.YCoord.ToBigInteger();
@@ -767,7 +760,7 @@ namespace YottaWally
             return sb.ToString().ToLower();
         }
 
-        public static void CreateSample(string outPathname, string password, string folderName) ///Creates a Encrypted ZIP form an existing Folder
+        private static void CreateSample(string outPathname, string password, string folderName) ///Creates a Encrypted ZIP form an existing Folder
         {
 
             FileStream fsOut = File.Create(outPathname);
@@ -832,50 +825,27 @@ namespace YottaWally
             }
         }
 
-        static void GetBalances(Balances balances) ///Gets the Balance for 5 YottaChain Addresses
+        static void GetBalances(List<Balances> balances) ///Gets All Balances
         {
             try
             {
-                List<string> addresses = new List<string>(); //List with all addresses in the Wallet
-
-                if (!File.Exists($@"Wallets/{openedWalletName}.json"))
+                if (balances.Count > 0)
                 {
-                    Print("Write your 5 Addresses:");
-                    for (int i = 0; i < 5; i++)
+                    WriteLine("    ------------------BALANCES------------------");
+                    foreach (var balance in balances)
                     {
-                        string address = ReadLine();
-                        addresses.Add(address);
-                    }
-                }
-
-                else
-                {
-                    using (StreamReader r = new StreamReader($@"Wallets/{openedWalletName}.json"))
-                    {
-                        string json = r.ReadToEnd();
-                        walletData = JsonConvert.DeserializeObject<WalletData>(json);
-                        for (int i = 0; i < 5; i++)
+                        foreach (var bal in balance.AddressBalances)
                         {
-                            addresses.Add(walletData.Addresses[i]);
-                        }
+                            Print($"\"{bal.Key}\" : \"{bal.Value}\"");
+                        };
                     }
+                    WriteLine("    --------------------------------------------");
                 }
-                WriteLine();
-                for (int i = 0; i < 5; i++)
-                {
-                    try
-                    {
-                        Print($"\"{addresses[i]}\" : {balances.AddressBalances[addresses[i]]}");
-                    }
-                    catch
-                    {
-                        Print($"\"{addresses[i]}\" : 0");
-                    }
-                }
+                else Print("No Balances Found!");
             }
             catch
             {
-                Print("ERROR! COULD NOT GET BALANCES!");
+                Print("ERROR! COULD NOT GET BALANCES");
             }
         }
 
