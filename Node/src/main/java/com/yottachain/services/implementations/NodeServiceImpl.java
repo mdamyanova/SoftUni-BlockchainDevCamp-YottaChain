@@ -178,6 +178,8 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public TransactionCreatedViewModel addTransaction(TransactionBindingModel model) throws Exception {
+        // TODO - find in from address in addresses hashmap
+        // TODO - subtract amount from it
         Transaction transaction = this.transactionService.create(model);
         this.transactionService.validate(transaction);
         if (!this.addresses.containsKey(model.getTo())) {
