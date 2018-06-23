@@ -10,8 +10,8 @@ com\yottachain\models\viewModels\ResetChainViewModel.class
 com\yottachain\models\viewModels\BalanceViewModel.class
 com\yottachain\YottachainNodeApplication.class
 com\yottachain\models\bindingModels\TransactionBindingModel.class
-com\yottachain\models\viewModels\BalanceForAddressViewModel.class
 com\yottachain\p2p\Peer.class
+com\yottachain\models\viewModels\BalanceByAddressViewModel.class
 com\yottachain\utils\CryptoUtils.class
 com\yottachain\models\viewModels\ErrorViewModel.class
 com\yottachain\entities\Transaction.class
@@ -19,12 +19,14 @@ com\yottachain\models\viewModels\BlockViewModel.class
 com\yottachain\services\implementations\NodeServiceImpl$1.class
 com\yottachain\entities\Address.class
 com\yottachain\models\viewModels\NodeInfoViewModel.class
-com\yottachain\entities\Example.class
 com\yottachain\config\WebSocketConfig.class
 com\yottachain\entities\Node.class
 com\yottachain\controllers\NodeController.class
 com\yottachain\services\implementations\NodeServiceImpl.class
+com\yottachain\models\bindingModels\MiningJobBindingModel.class
 com\yottachain\services\implementations\TransactionServiceImpl.class
 com\yottachain\utils\Helpers.class
+com\yottachain\entities\MiningJob.class
+com\yottachain\models\viewModels\MiningJobViewModel.class
 com\yottachain\p2p\PeerManager.class
 com\yottachain\services\implementations\NodeServiceImpl$2.class

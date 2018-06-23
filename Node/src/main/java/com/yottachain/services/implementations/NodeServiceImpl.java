@@ -3,8 +3,10 @@ package com.yottachain.services.implementations;
 import com.yottachain.entities.Address;
 import com.yottachain.entities.Block;
 import com.yottachain.entities.Transaction;
+import com.yottachain.models.bindingModels.MiningJobBindingModel;
 import com.yottachain.models.bindingModels.TransactionBindingModel;
 import com.yottachain.models.viewModels.*;
+import com.yottachain.p2p.Peer;
 import com.yottachain.services.interfaces.NodeService;
 import com.yottachain.services.interfaces.TransactionService;
 import com.yottachain.utils.Helpers;
@@ -27,6 +29,7 @@ public class NodeServiceImpl implements NodeService {
     private ConcurrentHashMap<String, Transaction> pendingTransactionsById;
     private ConcurrentHashMap<String, Transaction> confirmedTransactionsById;
     private ConcurrentHashMap<String, Address> addresses; // Address Id -> AddressId and Amount
+    private ConcurrentHashMap<String, Peer> peersByAddress;
     private final List<Block> blockchain;
 
     public NodeServiceImpl() {
@@ -35,6 +38,7 @@ public class NodeServiceImpl implements NodeService {
         this.pendingTransactionsById = new ConcurrentHashMap<>();
         this.confirmedTransactionsById = new ConcurrentHashMap<>();
         this.addresses = new ConcurrentHashMap<>();
+        this.peersByAddress = new ConcurrentHashMap<>();
         this.blockchain = new ArrayList<>();
         this.blockchain.add(generateGenesisBlock());
     }
@@ -42,13 +46,16 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public NodeInfoViewModel getInfo() {
         NodeInfoViewModel model = new NodeInfoViewModel();
-        model.setNodeId(0);
-        model.setHost("localhost");
+        model.setNodeId("0"); //TODO
+        model.setChainId(this.blockchain.get(0).getBlockHash());
+        model.setNodeUrl("http://127.0.0.1:8080");
+        model.setPeers(this.peersByAddress.size());
+        model.setCurrentDifficulty(0); //TODO
         model.setPort(8080);
-        model.setUrl("http://test.test");
-        model.setPeers(new ArrayList<>());
-        model.setChain(new ArrayList<>());
-        model.setChainId(0);
+        model.setBlocksCount(this.blockchain.size());
+        model.setConfirmedTransactions(this.confirmedTransactionsById.size());
+        model.setPendingTransactions(this.pendingTransactionsById.size());
+
         return model;
     }
 
@@ -86,7 +93,7 @@ public class NodeServiceImpl implements NodeService {
         Block genesis = new Block();
         List<Transaction> transactions = new ArrayList<>();
         Address address = new Address();
-        address.setAddressId("00");
+        address.setAddressId("0000000000000000000000000000000000000000");
 
         genesis.setIndex(0);
         genesis.setTransactions(transactions);
@@ -96,7 +103,7 @@ public class NodeServiceImpl implements NodeService {
         genesis.setBlockDataHash(Hex.toHexString("TODO".getBytes()));
         genesis.setNonce(0);
         genesis.setCreatedOn(0L);
-        genesis.setBlockDataHash(Hex.toHexString("TODO".getBytes()));
+        genesis.setBlockHash(Hex.toHexString("TODO".getBytes()));
         return genesis;
     }
 
@@ -134,10 +141,18 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public BalanceForAddressViewModel getBalanceForAddress(String address) {
-        // for address with no transactions -> return zeros
-        // for invalid address -> 404 Invalid address
-        return null; // TODO
+    public BalanceByAddressViewModel getBalanceByAddress(String address) throws Exception {
+        BalanceByAddressViewModel model = new BalanceByAddressViewModel();
+        Address addressInHashmap = this.addresses.get(address);
+        if (addressInHashmap == null) {
+            throw new Exception("Address not found");
+        }
+        model.setSafeBalance(0);
+        model.setConfirmedBalance(0);
+        model.setPendingBalance(0);
+        // for address with no transactions -> return zeros - TODO
+
+        return model;
     }
 
     @Override
@@ -164,13 +179,16 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public TransactionCreatedViewModel addTransaction(TransactionBindingModel model) throws Exception {
         Transaction transaction = this.transactionService.create(model);
-
-        // TODO add address to addresses !!! - hashmap?
-
-        String isValidMessage = this.transactionService.validate(transaction);
-
-        if (!isValidMessage.equals("Valid transaction")) {
-            throw new Exception(isValidMessage);
+        this.transactionService.validate(transaction);
+        if (!this.addresses.containsKey(model.getTo())) {
+            Address toBalance = new Address();
+            toBalance.setAddressId(model.getTo());
+            toBalance.setAmount(model.getAmount());
+            this.addresses.put(toBalance.getAddressId(), toBalance);
+        } else {
+            this.addresses.get(model.getTo()).setAmount(
+                    this.addresses.get(model.getTo()).getAmount() + model.getAmount()
+            );
         }
         if (this.confirmedTransactionsById.containsKey(transaction.getTransactionHash())) {
             throw new Exception("Transaction is already confirmed");
@@ -182,5 +200,15 @@ public class NodeServiceImpl implements NodeService {
         createdTrModel.setCreatedOn(Helpers.toISO8601UTC(ZonedDateTime.now()));
         createdTrModel.setTransactionHash(transaction.getTransactionHash());
         return createdTrModel;
+    }
+
+    @Override
+    public MiningJobViewModel submitMinedBlock(MiningJobBindingModel minedBlock) throws Exception {
+        return new MiningJobViewModel(); // TODO - implement
+    }
+
+    @Override
+    public MiningJobViewModel getMiningJob(String minerAddress) throws Exception {
+        return new MiningJobViewModel(); // TODO - implement
     }
 }

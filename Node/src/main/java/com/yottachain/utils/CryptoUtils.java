@@ -1,9 +1,14 @@
 package com.yottachain.utils;
 
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
+import org.bouncycastle.crypto.ec.ECPair;
 import org.bouncycastle.util.encoders.Hex;
+import org.web3j.crypto.ECKeyPair;
+import org.web3j.crypto.Sign;
 
 import java.math.BigInteger;
+import java.security.spec.ECPoint;
+import java.util.List;
 
 public class CryptoUtils {
 
@@ -15,5 +20,9 @@ public class CryptoUtils {
         byte[] result = new byte[digest.getDigestSize()];
         digest.doFinal(result, 0);
         return Hex.toHexString(bytes);
+    }
+
+    public static boolean verifySignature(String data, String publicKey, List<String> signature) {
+       return true; // TODO
     }
 }

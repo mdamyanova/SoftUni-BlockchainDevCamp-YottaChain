@@ -7,5 +7,5 @@ public interface TransactionService {
 
     Transaction create(TransactionBindingModel model);
     Transaction sign(Transaction transaction, String privateKey);
-    String validate(Transaction transaction);
+    boolean validate(Transaction transaction) throws Exception;
 }

@@ -7,28 +7,54 @@ import java.util.List;
 
 public class NodeInfoViewModel {
 
-    private int nodeId;
-    private String host;
+    private String nodeId;
+    private String chainId;
+    private String nodeUrl;
+    private long peers;
+    private int currentDifficulty;
     private int port;
-    private String url;
-    private List<Peer> peers;
-    private List<Block> chain;
-    private int chainId;
+    private long blocksCount;
+    private long confirmedTransactions;
+    private long pendingTransactions;
 
-    public int getNodeId() {
+    public String getNodeId() {
         return this.nodeId;
     }
 
-    public void setNodeId(int nodeId) {
+    public void setNodeId(String nodeId) {
         this.nodeId = nodeId;
     }
 
-    public String getHost() {
-        return this.host;
+    public String getChainId() {
+        return this.chainId;
     }
 
-    public void setHost(String host) {
-        this.host = host;
+    public void setChainId(String chainId) {
+        this.chainId = chainId;
+    }
+
+    public String getNodeUrl() {
+        return this.nodeUrl;
+    }
+
+    public void setNodeUrl(String nodeUrl) {
+        this.nodeUrl = nodeUrl;
+    }
+
+    public long getPeers() {
+        return this.peers;
+    }
+
+    public void setPeers(long peers) {
+        this.peers = peers;
+    }
+
+    public int getCurrentDifficulty() {
+        return this.currentDifficulty;
+    }
+
+    public void setCurrentDifficulty(int currentDifficulty) {
+        this.currentDifficulty = currentDifficulty;
     }
 
     public int getPort() {
@@ -39,35 +65,27 @@ public class NodeInfoViewModel {
         this.port = port;
     }
 
-    public String getUrl() {
-        return this.url;
+    public long getBlocksCount() {
+        return this.blocksCount;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setBlocksCount(long blocksCount) {
+        this.blocksCount = blocksCount;
     }
 
-    public List<Peer> getPeers() {
-        return this.peers;
+    public long getConfirmedTransactions() {
+        return this.confirmedTransactions;
     }
 
-    public void setPeers(List<Peer> peers) {
-        this.peers = peers;
+    public void setConfirmedTransactions(long confirmedTransactions) {
+        this.confirmedTransactions = confirmedTransactions;
     }
 
-    public List<Block> getChain() {
-        return this.chain;
+    public long getPendingTransactions() {
+        return this.pendingTransactions;
     }
 
-    public void setChain(List<Block> chain) {
-        this.chain = chain;
-    }
-
-    public int getChainId() {
-        return this.chainId;
-    }
-
-    public void setChainId(int chainId) {
-        this.chainId = chainId;
+    public void setPendingTransactions(long pendingTransactions) {
+        this.pendingTransactions = pendingTransactions;
     }
 }

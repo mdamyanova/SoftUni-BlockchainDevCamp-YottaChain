@@ -1,6 +1,6 @@
 package com.yottachain.models.viewModels;
 
-public class BalanceForAddressViewModel {
+public class BalanceByAddressViewModel {
 
     private long safeBalance;
     private long confirmedBalance;

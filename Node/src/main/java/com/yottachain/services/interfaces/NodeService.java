@@ -1,6 +1,7 @@
 package com.yottachain.services.interfaces;
 
 import com.yottachain.entities.Block;
+import com.yottachain.models.bindingModels.MiningJobBindingModel;
 import com.yottachain.models.bindingModels.TransactionBindingModel;
 import com.yottachain.models.viewModels.*;
 
@@ -16,7 +17,9 @@ public interface NodeService {
     List<TransactionViewModel> getTransactions(boolean isConfirmed);
     TransactionViewModel getTransactionByHash(String transactionHash) throws Exception;
     List<BalanceViewModel> getBalances();
-    BalanceForAddressViewModel getBalanceForAddress(String address);
+    BalanceByAddressViewModel getBalanceByAddress(String address) throws Exception;
     List<TransactionViewModel> getTransactionsByAddress(String address) throws Exception;
     TransactionCreatedViewModel addTransaction(TransactionBindingModel model) throws Exception;
+    MiningJobViewModel getMiningJob(String minerAddress) throws Exception;
+    MiningJobViewModel submitMinedBlock(MiningJobBindingModel minedBlock) throws Exception;
 }

@@ -14,10 +14,6 @@ public class Block {
     private long createdOn;
     private String blockHash;
 
-    public void generateHashes() {
-
-    }
-
     public int getIndex() {
         return this.index;
     }
