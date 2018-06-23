@@ -13,11 +13,21 @@ using System.IO;
 using System.Net.Http;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Nethereum.Hex.HexConvertors.Extensions;
+using Nethereum.Signer;
+using System.Net;
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Crypto.Signers;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Asn1.Sec;
+using Org.BouncyCastle.Asn1.X9;
 
 namespace YottaWally
 {
     class Program
     {
+        static readonly X9ECParameters curve = SecNamedCurves.GetByName("secp256k1");
         private static RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider(); ///Crypto Service Provider
         private static Secp256K1Manager secp256 = new Secp256K1Manager(); ///Secp256k1 Manager
         private static readonly HttpClient client = new HttpClient(); ///Http Client
@@ -100,7 +110,7 @@ namespace YottaWally
             if (loadWallet == true)
             {
                 Print($"You are in wallet {openedWalletName}.");
-                
+
                 while (true)
                 {
                     Write(">>> [\"Balance\", \"Send\", \"History\", \"Exit\"]: ");
@@ -124,7 +134,7 @@ namespace YottaWally
 
                             string cmd = ReadLine();
                             if (cmd.ToLower() == "wallet")
-                            { 
+                            {
                                 var task = FillBalancesClass();
                                 task.Wait(); //Waits for the task to Complete
                             }
@@ -152,6 +162,9 @@ namespace YottaWally
         static void Initialize() ///Initialization of the program
         {
             Title = "YottaWally v.1";
+            BackgroundColor = ConsoleColor.White;
+            Clear();
+            ForegroundColor = ConsoleColor.Black;
         }
 
         static void About(string[] availableOperations) ///Describes what the app does
@@ -218,7 +231,7 @@ namespace YottaWally
         {
             Write(">>> Type Wallet Name: ");
             string walletName = ReadLine();
-            if (File.Exists($@"Wallets/{walletName}.zip")|| File.Exists($@"Wallets/{walletName}.json"))
+            if (File.Exists($@"Wallets/{walletName}.zip") || File.Exists($@"Wallets/{walletName}.json"))
             {
                 Print($"ERROR! WALLET \"{walletName.ToUpper()}\" ALREADY EXISTS!");
                 return false;
@@ -304,6 +317,7 @@ namespace YottaWally
                     {
                         SaveToJSON(walletName, password, privateKeysString, publicKeysString, pubKeysCompressed, addresses);
                     }
+                    else walletData = new WalletData(walletName, password, privateKeysString, publicKeysString, pubKeysCompressed, addresses);
                 }
                 catch (Exception e)
                 {
@@ -446,7 +460,7 @@ namespace YottaWally
                     bool saveWallet = ReadLine().ToLower() == "y";
                     if (saveWallet)
                     {
-                        if(!SaveToJSON(walletName, password, privateKeysString, publicKeysString, pubKeysCompressed, addresses))
+                        if (!SaveToJSON(walletName, password, privateKeysString, publicKeysString, pubKeysCompressed, addresses))
                         {
                             Print("ERROR! COULD NOT SAVE TO JSON FILE!");
                         }
@@ -467,7 +481,7 @@ namespace YottaWally
             }
         }
 
-        static bool SaveToJSON(string walletName, string password, List<string> privateKeys,List<string>publicKeys,List<string> pubKeysCompressed,List<string> addresses) ///Saves Wallet to an Encrypted JSON file in a ZIP Folder
+        static bool SaveToJSON(string walletName, string password, List<string> privateKeys, List<string> publicKeys, List<string> pubKeysCompressed, List<string> addresses) ///Saves Wallet to an Encrypted JSON file in a ZIP Folder
         {
             if (!Directory.Exists($@"Wallets/{walletName}"))
             {
@@ -484,7 +498,7 @@ namespace YottaWally
             Print($"ERROR! WALLET \"{walletName}\" ALREADY EXISTS!");
             return false;
         }
-        
+
         static string RipeMDHash(string str) ///Gets the RIPEMD-160 Hash of given Byte Array
         {
             RIPEMD160 r160 = RIPEMD160.Create();
@@ -506,7 +520,7 @@ namespace YottaWally
         {
             try
             {
-                string responseString = await client.GetStringAsync("https://stormy-everglades-34766.herokuapp.com/balances");
+                string responseString = await client.GetStringAsync("http://localhost:8080/balances");
                 ConcurrentDictionary<string, decimal> addressBalances = JsonConvert.DeserializeObject<ConcurrentDictionary<string, decimal>>(responseString);
                 GetBalances(new Balances(addressBalances));
             }
@@ -522,7 +536,7 @@ namespace YottaWally
             string address = ReadLine();
             try
             {
-                string responseString = await client.GetStringAsync($"localhost:8080/address/{address}/balance");
+                string responseString = await client.GetStringAsync($"http://localhost:8080/address/{address}/balance");
                 AddressBalance addressBalance = JsonConvert.DeserializeObject<AddressBalance>(responseString);
 
                 Print($"Address: {address}");
@@ -543,8 +557,7 @@ namespace YottaWally
             string address = ReadLine();
             try
             {
-                //string responseString = await client.GetStringAsync($"localhost:8080/address/{address}/transactions");
-                string responseString = await client.GetStringAsync($"localhost:8080/address/{address}/transactions");
+                string responseString = await client.GetStringAsync($"http://localhost:8080/address/{address}/transactions");
                 List<GetTransaction> transactionHistory = JsonConvert.DeserializeObject<List<GetTransaction>>(responseString);
                 if (transactionHistory.Count > 0) {
                     foreach (var transaction in transactionHistory)
@@ -559,7 +572,7 @@ namespace YottaWally
                         WriteLine($"\"Sender Public Key\":{transaction.senderPubKey},");
                         WriteLine($"\"Transaction Data Hash\":{transaction.transactionDataHash},");
                         WriteLine("\"SenderSignature\": [");
-                        WriteLine($"{string.Join(",\n",transaction.senderSignature)}");
+                        WriteLine($"{string.Join(",\n", transaction.senderSignature)}");
                         WriteLine("],");
                         WriteLine($"\"Mined In Block Index\":{transaction.minedInBlockIndex},");
                         WriteLine($"\"transferSuccessful\":{Convert.ToString(transaction.transferSuccessful)}");
@@ -579,28 +592,154 @@ namespace YottaWally
         }
 
         static async Task Send()
-        { 
-            //CRITICAL BUG WITH SEND METHOD
-            //TODO: IMPLEMENT A METHOD THAT GETS EVERYTHING 
-            Print("From: ");
-            for (int i = 0; i < 5; i++)
+        {
+            try
             {
-                Print($"[{i+1}] {walletData.Addresses[i]}");
-            }
+                if (walletData.Addresses.Count > 0)
+                {
+                    Print("From: ");
+                    for (int i = 0; i < 5; i++)
+                    {
+                        Print($"[{i + 1}] {walletData.Addresses[i]}");
+                    }
 
-            int checker = int.Parse(ReadLine())-1; //Gets which Address is going to be used
-            string fromAddress = walletData.Addresses[checker];
-            string senderPubKey = walletData.PubKeysCompressed[checker];
-            Write(">>> To: ");
-            string toAddress = ReadLine();
-            Write(">>> Value: ");
-            decimal value = decimal.Parse(ReadLine());
-            Write(">>> Fee: ");
-            int fee = int.Parse(ReadLine());
-            Write(">>> Data: ");
-            string data = ReadLine();
-            int recoveryID = new int();
-            Secp256K1Manager.SignCompact(Encoding.UTF8.GetBytes(data), Encoding.UTF8.GetBytes(walletData.PrivateKeys[checker]),out recoveryID);
+                    Write(">>> ");
+                    int checker = int.Parse(ReadLine()) - 1; //Determines which Address is going to be used
+
+                    string fromAddress = walletData.Addresses[checker];
+                    string senderPubKey = walletData.PubKeysCompressed[checker];
+
+                    Write(">>> To: ");
+                    string toAddress = ReadLine();
+                    Write(">>> Value: ");
+                    long value = long.Parse(ReadLine());
+                    Write(">>> Fee: ");
+                    int fee = int.Parse(ReadLine());
+                    Write(">>> Data: ");
+                    string data = ReadLine();
+
+
+                    string transactionJson = CreateAndSignTransaction(
+                        recipientAddress: toAddress,
+                        value: value, fee: fee, data: data, iso8601datetime: DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+                        senderPrivKeyHex: walletData.PrivateKeys[checker]);
+
+                    var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://localhost:8080/transactions/send");
+                    httpWebRequest.ContentType = "application/json";
+                    httpWebRequest.Method = "POST";
+
+                    using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                    {
+                        streamWriter.Write(transactionJson);
+                        streamWriter.Flush();
+                        streamWriter.Close();
+                    }
+
+                    var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                }
+
+                else
+                {
+                    Print("ERROR! WALLET NOT LOADED!");
+                }
+            }
+            catch
+            {
+                Print("ERROR! COULD NOT MAKE A TRANSACTION! - Maybe You do not have enough YottaCoins?");
+            }
+        }
+
+        private static void ExistingPrivateKeyToAddress(string privKeyHex) ///Gets Private Key and Makes it into an Address
+        {
+            BigInteger privateKey = new BigInteger(privKeyHex, 16);
+            Org.BouncyCastle.Math.EC.ECPoint pubKey = GetPublicKeyFromPrivateKey(privateKey);
+            string pubKeyCompressed = EncodeECPointHexCompressed(pubKey);
+            string addr = RipeMDHash(pubKeyCompressed);
+        }
+
+        private static BigInteger[] SignData(BigInteger privateKey, byte[] data) ///Signs Data with Private Key
+        {
+            ECDomainParameters ecSpec = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
+            ECPrivateKeyParameters keyParameters = new ECPrivateKeyParameters(privateKey, ecSpec);
+            IDsaKCalculator kCalculator = new HMacDsaKCalculator(new Sha256Digest());
+            ECDsaSigner signer = new ECDsaSigner(kCalculator);
+            signer.Init(true, keyParameters);
+            BigInteger[] signature = signer.GenerateSignature(data);
+            return signature;
+        }
+
+        private static string CreateAndSignTransaction(string recipientAddress, long value,
+            int fee, string data, string iso8601datetime, string senderPrivKeyHex) ///Creates and Signs Transaction
+        {
+            BigInteger privateKey = new BigInteger(senderPrivKeyHex, 16);
+            Org.BouncyCastle.Math.EC.ECPoint pubKey = GetPublicKeyFromPrivateKey(privateKey);
+            string senderPubKeyCompressed = EncodeECPointHexCompressed(pubKey);
+
+            string senderAddress = RipeMDHash(senderPubKeyCompressed);
+
+            var tran = new //Creates unsigned Transaction
+            {
+                from = senderAddress,
+                to = recipientAddress,
+                value,
+                fee,
+                dateCreated = iso8601datetime,
+                data,
+                senderPubKey = senderPubKeyCompressed,
+            };
+            string tranJson = JsonConvert.SerializeObject(tran);
+
+            byte[] tranHash = CalcSHA256(tranJson);
+
+            BigInteger[] tranSignature = SignData(privateKey, tranHash);
+
+            var tranSigned = new //Signed Transaction
+            {
+                from = senderAddress,
+                to = recipientAddress,
+                senderPubKey = senderPubKeyCompressed,
+                value,
+                fee,
+                data,
+                dateCreated = iso8601datetime,
+                senderSignature = new string[]
+                {
+                tranSignature[0].ToString(16),
+                tranSignature[1].ToString(16)
+                }
+            };
+
+            string signedTranJson = JsonConvert.SerializeObject(tranSigned, Formatting.Indented);
+            Print("Transaction Hash: " + BytesToHex(tranHash));
+            return signedTranJson;
+        }
+
+        private static byte[] CalcSHA256(string str) ///Calculates SHA256 of a given string
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(str);
+            Sha256Digest digest = new Sha256Digest();
+            digest.BlockUpdate(bytes, 0, bytes.Length);
+            byte[] result = new byte[digest.GetDigestSize()];
+            digest.DoFinal(result, 0);
+            return result;
+        }
+
+        public static string BytesToHex(byte[] bytes) ///Gets a Byte Array and returns a HEX string
+        {
+            return string.Concat(bytes.Select(b => b.ToString("x2")));
+        }
+
+        public static Org.BouncyCastle.Math.EC.ECPoint GetPublicKeyFromPrivateKey(BigInteger privKey) ///Recovers Public Key from Private Key
+        {
+            Org.BouncyCastle.Math.EC.ECPoint pubKey = curve.G.Multiply(privKey).Normalize();
+            return pubKey;
+        }
+
+        public static string EncodeECPointHexCompressed(Org.BouncyCastle.Math.EC.ECPoint point)
+        {
+            BigInteger x = point.XCoord.ToBigInteger();
+            BigInteger y = point.YCoord.ToBigInteger();
+            return x.ToString(16) + Convert.ToInt32(y.TestBit(0));
         }
 
         static byte[] StringToByteArray(string hex) ///Gets HEX string and returns it as a Byte Array
@@ -680,7 +819,8 @@ namespace YottaWally
         static void GetAllWallets() ///Prints All Wallets on this Computer
         {
             Directory.CreateDirectory($@"Wallets/");
-            string[] allWallets = Directory.GetFiles(@"Wallets/", "*.zip");
+            string[] zipWallets = Directory.GetFiles(@"Wallets/", "*.zip");
+            string[] allWallets = zipWallets.Concat(Directory.GetFiles(@"Wallets/", "*.json")).ToArray();
             if (allWallets.Length > 0)
             {
                 Print("Wallets on this computer:");

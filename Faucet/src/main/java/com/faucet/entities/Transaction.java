@@ -4,48 +4,41 @@ import java.util.Date;
 
 public class Transaction {
 
-    private long id;
-    private String from;
-    private String to;
-    private int value;
+    private String addressFrom;
+    private String addressTo;
     private String senderPublicKey;
-    private String nodeUrl;
+    private int value;
+    private int fee;
+    private String dateCreated;
     private Date lastRequest;
+    private String[] senderSignature;
 
-    public Transaction() {
+
+    public Transaction(String addressFrom, String addressTo, String senderPublicKey, int value, int fee, String dateCreated, String[] senderSignature) {
+        this.addressFrom = addressFrom;
+        this.addressTo = addressTo;
+        this.senderPublicKey = senderPublicKey;
+        this.value = value;
+        this.fee = fee;
+        this.dateCreated = dateCreated;
+        this.senderSignature = senderSignature;
         this.lastRequest = new Date();
     }
 
-    public long getId() {
-        return id;
+    public String getAddressFrom() {
+        return addressFrom;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setAddressFrom(String addressFrom) {
+        this.addressFrom = addressFrom;
     }
 
-    public String getFrom() {
-        return from;
+    public String getAddressTo() {
+        return addressTo;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
-    public String getTo() {
-        return to;
-    }
-
-    public void setTo(String to) {
-        this.to = to;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public void setValue(int value) {
-        this.value = value;
+    public void setAddressTo(String addressTo) {
+        this.addressTo = addressTo;
     }
 
     public String getSenderPublicKey() {
@@ -56,12 +49,28 @@ public class Transaction {
         this.senderPublicKey = senderPublicKey;
     }
 
-    public String getNodeUrl() {
-        return nodeUrl;
+    public int getValue() {
+        return value;
     }
 
-    public void setNodeUrl(String nodeUrl) {
-        this.nodeUrl = nodeUrl;
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public int getFee() {
+        return fee;
+    }
+
+    public void setFee(int fee) {
+        this.fee = fee;
+    }
+
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(String dateCreated) {
+        this.dateCreated = dateCreated;
     }
 
     public Date getLastRequest() {
@@ -70,5 +79,13 @@ public class Transaction {
 
     public void setLastRequest(Date lastRequest) {
         this.lastRequest = lastRequest;
+    }
+
+    public String[] getSenderSignature() {
+        return senderSignature;
+    }
+
+    public void setSenderSignature(String[] senderSignature) {
+        this.senderSignature = senderSignature;
     }
 }

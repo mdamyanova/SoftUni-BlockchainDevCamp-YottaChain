@@ -9,7 +9,7 @@ namespace YottaWally
         ///A Class Managing [GET]Transactions
         public string from { get; set; }
         public string to { get; set; }
-        public decimal value { get; set; }
+        public long value { get; set; }
         public int fee { get; set; }
         public string dateCreated { get; set; }
         public string data { get; set; }
