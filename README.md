@@ -9,7 +9,7 @@ YottaChain is a **fully-functional blockchain** network consisting of **Nodes**,
 ### **Node**
 - Contributor: **Mirela Damyanova - [mdamyanova](https://github.com/mdamyanova)**
 - Functionality: **peer-to-peer communication, blocks, transactions, consensus, REST API**
-- Technologies: Java, Spring MVC, BouncyCastle
+- Technologies: Java, Spring MVC, BouncyCastle, Web3j
 
 ### **Mining** software
 - Contributor: **Velik Lazarov - [VelikHimik](https://github.com/VelikHimik)**
